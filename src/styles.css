@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+:root {
+    --background: #131517;
+    --secondary: rgba(29, 31, 32, 0.356);
+    --tertiary: #129dfd;
+}
+
+@theme {
+    --color-primary: #131517;
+    /* --color-primary-light: #181a1c; */
+    --color-primary-light: rgba(29, 31, 32, 0.311);;
+    --color-secondary: #129dfd;
+}
