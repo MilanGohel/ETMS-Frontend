@@ -1,0 +1,48 @@
+/* Using :host and ::ng-deep to override PrimeNG component styles */
+:host ::ng-deep .p-breadcrumb {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+:host ::ng-deep .p-breadcrumb .p-menuitem-link {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  transition: none; /* remove default transitions */
+  border-radius: 4px;
+}
+
+/* Style for icon and text inside the breadcrumb link */
+:host ::ng-deep .p-breadcrumb .p-menuitem-text,
+:host ::ng-deep .p-breadcrumb .p-menuitem-icon {
+  color: #9ca3af; /* text-gray-400 */
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+:host ::ng-deep .p-breadcrumb .p-menuitem-icon {
+    margin-right: 0.5rem;
+}
+
+/* Style for the separator chevron */
+:host ::ng-deep .p-breadcrumb-chevron {
+  color: #4b5563; /* text-gray-600 */
+  margin: 0 0.75rem;
+  font-size: 0.7rem;
+}
+
+/* Style for the last, active breadcrumb item */
+:host ::ng-deep .p-breadcrumb .p-menuitem:last-of-type .p-menuitem-text {
+    color: #ffffff; /* white */
+}
+
+:host ::ng-deep .p-breadcrumb .p-menuitem:last-of-type .p-menuitem-icon {
+    color: #ffffff;
+}
+
+/* Hover effect for non-active items */
+:host ::ng-deep .p-breadcrumb .p-menuitem:not(:last-of-type) .p-menuitem-link:hover .p-menuitem-text,
+:host ::ng-deep .p-breadcrumb .p-menuitem:not(:last-of-type) .p-menuitem-link:hover .p-menuitem-icon {
+    color: #ffffff; /* white on hover */
+}

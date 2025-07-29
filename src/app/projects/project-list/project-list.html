@@ -1,0 +1,11 @@
+<div class="flex flex-col space-y-4 mt-5">
+    @for (project of projectList; track project.id) {
+        <div
+            class="group cursor-pointer bg-black p-4 rounded-xl border-2 border-transparent group-hover:border-sky-500 transition-all duration-200">
+            <h3 class="text-xl font-semibold group-hover:text-sky-400 transition-colors">{{project.name}}</h3>
+            <p class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">{{project.description}}</p>
+        </div>
+    }
+
+
+</div>

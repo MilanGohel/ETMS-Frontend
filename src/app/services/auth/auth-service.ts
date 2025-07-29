@@ -1,0 +1,170 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
+import { LoginRequestDto, LoginResponseDto } from "../../core/models/auth";
+import { ApiResponse } from "../../core/models/common"
+import { environment } from '../../../environments/environment.development';
+import { CurrentUserDto } from '../../core/models/auth/current-user.dto';
+import { jwtDecode } from "jwt-decode";
+import { setCurrentUser } from '../../stores/current-user.actions';
+import { Store } from '@ngrx/store';
+import { selectCurrentUser } from '../../stores/current-user.selectors';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private tokenKey = 'AccessToken';
+  private refreshTokenKey = 'RefreshToken';
+  private apiUrl = environment.apiUrl;
+  private router = inject(Router);
+  private http = inject(HttpClient);
+  private store = inject(Store);
+  isAuthenticated$ = new BehaviorSubject<boolean | null>(null);
+
+  currentUserProfile$ = this.store.select(selectCurrentUser);
+
+  getUser(): Observable<ApiResponse<CurrentUserDto> | null> {
+    return this.http.get<ApiResponse<CurrentUserDto>>(`${this.apiUrl}/api/auth/me`, {
+      withCredentials: true
+    }).pipe(
+      tap(response => {
+        this.isAuthenticated$.next(true);
+
+        setCurrentUser({ user: response.data })
+      }),
+      catchError(error => {
+        console.error('Failed to fetch user profile:', error);
+        this.isAuthenticated$.next(false);
+        return of(null);
+      })
+    );
+  }
+
+
+  login(email: string, password: string): Observable<ApiResponse<LoginResponseDto>> {
+    const loginRequest: LoginRequestDto = { email, password };
+
+    return this.http.post<ApiResponse<LoginResponseDto>>(
+      `${this.apiUrl}/api/auth/login`,
+      loginRequest
+    ).pipe(
+      tap(response => {
+        debugger;
+        if (response.succeeded) {
+          console.log(response)
+          localStorage.setItem("AccessToken", response.data.accessToken);
+          localStorage.setItem("RefreshToken", response.data.refreshToken);
+        }
+        else {
+          console.error(response.data);
+        }
+      }),
+      catchError(error => {
+        console.error('Login failed:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  refreshToken(): Observable<ApiResponse<LoginResponseDto>> {
+    const refreshToken = localStorage.getItem(this.refreshTokenKey);
+
+    const body = { refreshToken };
+    return this.http.post<ApiResponse<LoginResponseDto>>(
+      `${this.apiUrl}/api/auth/refresh`,
+      body,
+      { withCredentials: true }
+    ).pipe(
+      tap(
+        response => {
+          if (response.succeeded) {
+            localStorage.setItem("AccessToken", response.data.accessToken);
+            localStorage.setItem("RefreshToken", response.data.refreshToken);
+          }
+        }
+      ),
+      catchError(error => {
+        console.error('Refresh Token failed: ', error)
+        return throwError(() => error);
+      })
+    );
+  }
+
+  logout(): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.refreshTokenKey);
+    }
+    this.router.navigate(["/login"]);
+  }
+
+  isValidTokens$(): Observable<boolean> {
+    if (typeof window === 'undefined' || !window.localStorage) return of(false);
+
+    const accessToken = localStorage.getItem(this.tokenKey);
+    const refreshToken = localStorage.getItem(this.refreshTokenKey);
+
+    if (!refreshToken) return of(false);
+
+    if (!accessToken || this.isTokenExpired(accessToken)) {
+      // Try refreshing the token
+      return this.refreshToken().pipe(
+        switchMap(() => {
+          const newAccessToken = localStorage.getItem(this.tokenKey);
+          if (!newAccessToken || this.isTokenExpired(newAccessToken) || this.isTokenExpired(refreshToken)) {
+            return of(false);
+          }
+
+          if (this.currentUserProfile$) return of(true);
+
+          return this.getUser().pipe(
+            map(user => !!user),
+            catchError(() => of(false))
+          );
+        }),
+        catchError(() => of(false))
+      );
+    }
+
+    // Access token was valid
+    if (this.isTokenExpired(refreshToken)) return of(false);
+
+    if (this.currentUserProfile$) return of(true);
+
+    return this.getUser().pipe(
+      map(user => !!user),
+      catchError(() => of(false))
+    );
+  }
+
+
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.refreshTokenKey);
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.isValidTokens$();
+  }
+
+  isTokenExpired(token: string): boolean {
+    if (!token) {
+      return true;
+    }
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      if (!decodedToken.exp) {
+        return true;
+      }
+      return decodedToken.exp < currentTime;
+    } catch (error) {
+      return true;
+    }
+  }
+}

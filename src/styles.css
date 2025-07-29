@@ -10,6 +10,7 @@
 @theme {
     --color-primary: #131517;
     /* --color-primary-light: #181a1c; */
-    --color-primary-light: rgba(29, 31, 32, 0.311);;
+    --color-primary-light: rgba(29, 31, 32, 0.311);
+    --color-primary-gray: rgba(29, 31, 32, 0.6);
     --color-secondary: #129dfd;
 }

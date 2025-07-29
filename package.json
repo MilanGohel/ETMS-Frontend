@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "start:dev": "ng serve --configuration=development",
+    "start:prod": "ng serve --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:ETMS": "node dist/ETMS/server/server.mjs"
@@ -31,9 +33,13 @@
     "@angular/ssr": "^20.1.0",
     "@ng-icons/core": "^32.1.0",
     "@ng-icons/lucide": "^32.1.0",
+    "@ngrx/store": "^20.0.0",
+    "@primeuix/themes": "^1.2.1",
     "@tailwindcss/postcss": "^4.1.11",
     "express": "^5.1.0",
+    "jwt-decode": "^4.0.0",
     "postcss": "^8.5.6",
+    "primeng": "^20.0.0",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.11",
     "tslib": "^2.3.0"
