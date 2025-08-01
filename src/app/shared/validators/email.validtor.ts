@@ -13,5 +13,3 @@ export function customEmailValidator(): ValidatorFn {
   };
 }
 
-// // Usage in component
-// email: ['', [Validators.required, customEmailValidator()]]

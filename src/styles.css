@@ -5,6 +5,7 @@
     --background: #131517;
     --secondary: rgba(29, 31, 32, 0.356);
     --tertiary: #129dfd;
+    --p-button-primary-background: #129dfd;
 }
 
 @theme {
@@ -14,3 +15,4 @@
     --color-primary-gray: rgba(29, 31, 32, 0.6);
     --color-secondary: #129dfd;
 }
+

@@ -1,15 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
-import { LoginRequestDto, LoginResponseDto } from "../../core/models/auth";
-import { ApiResponse } from "../../core/models/common"
+import { BehaviorSubject, catchError, map, Observable, of, retry, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { CurrentUserDto } from '../../core/models/auth/current-user.dto';
 import { jwtDecode } from "jwt-decode";
 import { setCurrentUser } from '../../stores/current-user.actions';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser } from '../../stores/current-user.selectors';
+import { ApiResponse, CurrentUserDto, ErrorResponse, LoginRequestDto, LoginResponseDto, SignUpRequestDto } from '../../core/models';
 
 @Injectable({
   providedIn: 'root'
@@ -51,7 +49,7 @@ export class AuthService {
       loginRequest
     ).pipe(
       tap(response => {
-        debugger;
+
         if (response.succeeded) {
           console.log(response)
           localStorage.setItem("AccessToken", response.data.accessToken);
@@ -62,10 +60,44 @@ export class AuthService {
         }
       }),
       catchError(error => {
+
         console.error('Login failed:', error);
         return throwError(() => error);
       })
     );
+  }
+
+  signUp(signUpRequest: SignUpRequestDto) :Observable<ApiResponse<object> | ErrorResponse> {
+    debugger;
+    return this.http.post<ApiResponse<object> | ErrorResponse>(
+      `${this.apiUrl}/api/auth/signup`,
+      signUpRequest
+    ).pipe(
+      tap(response => {
+        if (!response.succeeded) {
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: response.message,
+            errors: [response.message],
+            statusCode: response.statusCode
+          }
+
+          return of(failedResponse);
+        }
+        return response;
+      })
+      ,
+      catchError((error: HttpErrorResponse) => {
+        debugger;
+        const failedResponse: ErrorResponse = {
+          succeeded: false,
+          message: error.error.message,
+          errors: [error.error],
+          statusCode: error.status
+        }
+        return of(failedResponse);
+      })
+    )
   }
 
   refreshToken(): Observable<ApiResponse<LoginResponseDto>> {
@@ -101,6 +133,7 @@ export class AuthService {
   }
 
   isValidTokens$(): Observable<boolean> {
+
     if (typeof window === 'undefined' || !window.localStorage) return of(false);
 
     const accessToken = localStorage.getItem(this.tokenKey);

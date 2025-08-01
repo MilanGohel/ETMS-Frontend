@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -14,8 +14,10 @@ import {
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ProjectService } from '../../services/project/project-service';
+import { ProjectDto } from '../../core/models';
+import { BoardComponent } from '../../board/board.component';
 @Component({
   selector: 'app-project-details',
   standalone: true,
@@ -24,7 +26,8 @@ import { RouterLink } from '@angular/router';
     BreadcrumbModule,
     ButtonModule,
     NgIcon,
-    RouterLink
+    RouterLink,
+    BoardComponent
   ],
   viewProviders: [provideIcons({
     lucideLayoutDashboard,
@@ -39,7 +42,30 @@ import { RouterLink } from '@angular/router';
   templateUrl: './project-details.html',
   styleUrl: './project-details.css'
 })
-export class ProjectDetails {
+export class ProjectDetails implements OnInit {
+  projectId: number = 0;
+  currentProject: WritableSignal<ProjectDto | null> = signal(null);
+
+  constructor(
+    private activeRoute: ActivatedRoute,
+    private router: Router,
+    private projectService: ProjectService
+  ) { }
+
+  ngOnInit(): void {
+    this.projectId = +this.activeRoute.snapshot.paramMap.get('id')!;
+    this.projectService.getProjectById(this.projectId).subscribe(response => {
+      if (response.succeeded) {
+        this.currentProject.set(response.data);
+      }
+      else {
+        //do something if project no found  or error occurs
+        // currently redirecting user back to project list
+        this.router.navigate(["projects"]);
+      }
+    })
+  }
+
 
 
   items: MenuItem[] = [

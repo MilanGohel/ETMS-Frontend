@@ -36,13 +36,13 @@ export function authInterceptor(
         catchError((error) => {
             if (error instanceof HttpErrorResponse && error.status == 401 && !isAllowed) {
                 // Attempt refresh, then retry original request
-                return authService.refreshToken().pipe(
-                    switchMap(() => next(clonedReq)), // retry the original request
-                    catchError((err) => {
-                        authService.logout();
-                        return throwError(() => err);
-                    })
-                );
+                // return authService.refreshToken().pipe(
+                //     switchMap(() => next(clonedReq)), // retry the original request
+                //     catchError((err) => {
+                //         // authService.logout();
+                //         return throwError(() => err);
+                //     })
+                // );
             }
             return throwError(() => error);
         })

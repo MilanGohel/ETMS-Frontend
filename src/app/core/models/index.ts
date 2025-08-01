@@ -1,2 +1,86 @@
-export * from './auth';
-export * from './common';
+export interface TaskDto {
+  name: string;
+  description?: string;
+  statusId: number;
+  boardId: number;
+}
+
+export interface BoardDto {
+  id: number,
+  name: string,
+  Tasks: TaskDto
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  message: string;
+  errors: string[];
+  succeeded: boolean;
+  statusCode: number;
+}
+
+export interface ErrorResponse {
+  succeeded: false;
+  message: string;
+  errors: string[];
+  statusCode: number;
+}
+
+export enum StatusEnum {
+  Pending = 1,
+  InProgress = 2,
+  Completed = 3,
+  OnHold = 4,
+  Cancelled = 5,
+}
+
+export interface Status {
+  id: number;
+  name: string;
+}
+
+export interface ProjectDto {
+  id: number;
+  name: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+  statusId: StatusEnum;
+  status?: Status;
+}
+
+export interface CreateProjectDto {
+  name: string;
+  description?: string;
+  startDate: string; 
+  endDate: string; 
+}
+
+
+export interface CurrentUserDto {
+  id: number;
+  firstname: string;
+  lastname: string;
+  username: string;
+  profileUrl?: string;
+  email: string;
+}
+
+export interface LoginRequestDto {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponseDto {
+  accessToken: string;
+  accessExpiresAt: Date;
+  refreshToken: string;
+  refreshTokenExpiresAt: Date;
+}
+export interface SignUpRequestDto {
+  firstname: string;
+  lastname: string;
+  username: string;
+  email: string;
+  password: string;
+}

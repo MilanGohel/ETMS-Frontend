@@ -1,4 +1,4 @@
-import { CurrentUserDto } from "../core/models/auth/current-user.dto";
+import { CurrentUserDto } from "../core/models";
 
 export interface CurrentUserState {
   user: CurrentUserDto | null;
