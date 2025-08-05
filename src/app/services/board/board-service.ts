@@ -54,7 +54,7 @@ export class BoardService {
   }
 
   updateBoard(board: BoardDto) {
-    debugger;
+    ;
     const url = `${this.apiUrl}/api/Board/${board.id}`;
 
     return this.http.put<ApiResponse<object>>(url, { ...board }, { withCredentials: true })

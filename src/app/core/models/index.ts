@@ -36,6 +36,7 @@ export interface ProjectDto {
   endDate: Date;
   statusId: StatusEnum;
   status?: Status;
+  isAddDefaultBoards?: boolean
 }
 
 export interface CreateProjectDto {

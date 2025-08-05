@@ -15,7 +15,7 @@ export function userNameValidator(): ValidatorFn {
 
 export function userNameExistsValidator(userService: UserService): AsyncValidatorFn {
   return (control: AbstractControl): Observable<ValidationErrors | null> => {
-    debugger;
+    ;
     if (!control.value || control.invalid) {
       return of(null);
     }

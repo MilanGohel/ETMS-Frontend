@@ -65,6 +65,7 @@ export class ProjectService {
   }
 
   createProject(project: ProjectDto): Observable<ProjectApiResult> {
+    debugger;
     const url = `${this.apiUrl}/api/Project`;
     return this.http.post<ProjectApiResult>(url,
       { ...project },
@@ -91,6 +92,24 @@ export class ProjectService {
       { ...project },
       { withCredentials: true }
     )
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error("Api call failed to Create Project", error);
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: error.error.message,
+            errors: [error.error],
+            statusCode: error.status
+          }
+          return of(failedResponse);
+        })
+      )
+  }
+
+  deleteProject(projectId: number): Observable<ApiResponse<object> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/Project/${projectId}`;
+
+    return this.http.delete<ApiResponse<object> | ErrorResponse>(url, { withCredentials: true })
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error("Api call failed to Create Project", error);

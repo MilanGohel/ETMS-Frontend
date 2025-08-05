@@ -1,18 +1,19 @@
-import { Component, inject, input, OnChanges, OnInit, output, signal, SimpleChanges, WritableSignal } from '@angular/core';
+import { Component, ElementRef, inject, input, OnChanges, OnInit, output, QueryList, signal, SimpleChanges, ViewChild, WritableSignal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideEllipsisVertical, lucidePlus } from "@ng-icons/lucide";
 import { BoardService } from '../../../../services/board/board-service';
-import { BoardDto } from '../../../../core/models';
+import { BoardDto, StatusEnum } from '../../../../core/models';
 import { ToastService } from '../../../../services/toast/toast.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { PopoverModule } from 'primeng/popover';
 import { presetColors } from '../../../../shared/constants/constant';
 import { ColorPicker } from 'primeng/colorpicker';
 import { FormsModule } from '@angular/forms';
-
+import { InputTextModule } from 'primeng/inputtext';
+import { ProjectTaskComponent } from '../../../task/project-task/project-task.component';
 @Component({
   selector: 'app-board-component',
-  imports: [NgIcon, NgStyle, PopoverModule, NgClass, ColorPicker, FormsModule],
+  imports: [NgIcon, NgStyle, PopoverModule, NgClass, ColorPicker, FormsModule, InputTextModule, FormsModule, ProjectTaskComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
   viewProviders: [provideIcons({
@@ -22,6 +23,7 @@ import { FormsModule } from '@angular/forms';
 })
 
 export class BoardComponent implements OnInit {
+  @ViewChild("newTaskInput") taskInputElementRef!: QueryList<ElementRef>;
   boards: WritableSignal<BoardDto[]> = signal([]);
   projectId = input<number>(0);
   showBoardModal: WritableSignal<boolean> = signal<boolean>(false);
@@ -53,7 +55,7 @@ export class BoardComponent implements OnInit {
       if (input) {
         (input as HTMLInputElement).focus();
       }
-    });
+    }, 100);
   }
 
   onEditNameInput(event: Event) {
@@ -69,19 +71,25 @@ export class BoardComponent implements OnInit {
       return { ...prev, colorCode: this.colorValue() } as BoardDto
     })
 
+    this.boards.update(prevBoards => {
+      return prevBoards.map(b => b.id === this.editingBoard()!.id? {
+       ...b,
+        colorCode: this.colorValue()
+      } : b)
+    })
+
     this.boardService.updateBoard(this.editingBoard()!).subscribe({
       next: res => {
         if (res.succeeded) {
           console.log("Color Changed");
-          
-          this.loadBoards();
+         
+          console.log(this.boards());
         }
       },
       error: error => {
         this.toastService.error("Error", error.message);
       }
     })
-
 
     this.editingBoard.set(null); this.colorValue.set('');
   }
@@ -122,7 +130,7 @@ export class BoardComponent implements OnInit {
     this.boardService.getBoardsByProjectId(this.projectId()).subscribe({
       next: res => {
         if (res.succeeded) {
-          console.log(res)
+          console.log(JSON.stringify(res) + "result")
           this.boards.set(res.data);
         }
       },
@@ -130,6 +138,44 @@ export class BoardComponent implements OnInit {
         console.error('Board loading failed', err);
       }
     });
-
   }
+
+
+  // Code Related to Tasks
+  showAddTaskInput = signal<boolean>(false);
+  newTaskInputValue = '';
+
+  onAddNewTaskClick(board: BoardDto) {
+    this.showAddTaskInput.set(true);
+    this.editingBoard.set(board);
+    const taskInput = document.getElementById("newTaskInput");
+    if (taskInput) {
+      setTimeout(() => {
+        this.taskInputElementRef.last.nativeElement.focus();
+      }, 0);
+    }
+  }
+
+  onBlurNewTask() {
+    if (this.newTaskInputValue) {
+      const updatedBoard = structuredClone(this.editingBoard());
+      if (!updatedBoard || !updatedBoard.id) return;
+      updatedBoard.tasks = [...(updatedBoard.tasks ?? []), { name: this.newTaskInputValue, boardId: updatedBoard.id, statusId: StatusEnum.Pending }];
+
+      // Update editing board
+      this.editingBoard.set(updatedBoard);
+
+      // Update board in boards list
+      this.boards.update((prevBoards) =>
+        prevBoards.map((b) => b.id === updatedBoard.id ? updatedBoard : b)
+      );
+
+      this.newTaskInputValue = '';
+      console.log(this.boards());
+      // Optional: API call to persist
+    }
+
+    this.editingBoard.set(null);
+  }
+
 }

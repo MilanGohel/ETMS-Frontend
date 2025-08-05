@@ -117,7 +117,7 @@ export class ProjectDetails implements OnInit {
   }
 
   onBoardSubmit(boardDto: BoardDto) {
-    debugger;
+    ;
     const request = !boardDto.id
       ? this.boardService.createNewBoard(boardDto)
       : this.boardService.updateBoard(boardDto);

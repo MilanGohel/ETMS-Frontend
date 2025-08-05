@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
-
+@plugin "tailwindcss-primeui";
+@import "primeicons/primeicons.css";
 :root {
     --background: #131517;
     --secondary: rgba(29, 31, 32, 0.356);
@@ -16,3 +17,18 @@
     --color-secondary: #129dfd;
 }
 
+::ng-deep {
+    .p-button .p-button.p-highlight {
+        background: red;
+        background-color: red;
+    }
+
+    .p-button .p-button.p-highlight:hover {
+        background: green;
+    }
+
+    .custom-button {
+        background-color: red !important;
+        background: red !important;
+    }
+}

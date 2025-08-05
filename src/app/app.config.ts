@@ -84,8 +84,13 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: AuraCustomDark,
         options: {
-          darkModeSelector: true || 'none'
+          darkModeSelector: true || 'none',
+          cssLayer: {
+            name: 'primeng',
+            order: 'theme, base, primeng'
+          }
         },
+
       },
       zIndex: {
         modal: 1100,    // dialog, sidebar
@@ -94,7 +99,7 @@ export const appConfig: ApplicationConfig = {
         tooltip: 1100   // tooltip
       }
     }),
-    
+
     importProvidersFrom(ToastModule),
     importProvidersFrom(ConfirmPopupModule),
     ConfirmationService,

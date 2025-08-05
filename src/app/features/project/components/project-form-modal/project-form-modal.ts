@@ -8,7 +8,8 @@ import {
   inject,
   OnInit,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  input
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
@@ -16,17 +17,18 @@ import { DialogModule } from 'primeng/dialog';
 import { CommonModule } from '@angular/common';
 import { ProjectDto, StatusEnum } from '../../../../core/models';
 import { dateRangeValidator } from '../../../../shared/validators/dateRange.validator';
-
+import { CheckboxModule } from 'primeng/checkbox';
 @Component({
   selector: 'app-project-form-modal',
   templateUrl: './project-form-modal.html',
   styleUrls: ['./project-form-modal.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, DatePicker, DialogModule, CommonModule]
+  imports: [ReactiveFormsModule, DatePicker, DialogModule, CommonModule, CheckboxModule]
 })
 export class ProjectFormModal implements OnInit, OnChanges {
   @Input() visible = false;
   @Input() project: ProjectDto | null = null;
+  isEditing = input<boolean>(false);
 
   @Output() onClose = new EventEmitter<void>();
   @Output() onSubmit = new EventEmitter<ProjectDto>();
@@ -39,8 +41,9 @@ export class ProjectFormModal implements OnInit, OnChanges {
       name: ['', Validators.required],
       description: [''],
       startDate: [null, Validators.required],
-      endDate: [null, Validators.required]
-    }, {dateRangeValidator});
+      endDate: [null, Validators.required],
+      isAddDefaultBoards: [false]
+    }, dateRangeValidator);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -49,9 +52,10 @@ export class ProjectFormModal implements OnInit, OnChanges {
         name: this.project.name,
         description: this.project.description,
         startDate: new Date(this.project.startDate),
-        endDate: new Date(this.project.endDate)
+        endDate: new Date(this.project.endDate),
+        isAddDefaultBoards: this.project.isAddDefaultBoards
       });
-    } else if (changes['project'] && this.project === null) {
+    } else if (changes['project'] && this.project === null && this.form) {
       this.form.reset();
     }
   }
@@ -65,7 +69,6 @@ export class ProjectFormModal implements OnInit, OnChanges {
   }
 
   submitForm() {
-    debugger;
     if (this.form.invalid || this.form.value.startDate >= this.form.value.endDate) return;
 
     const isNew = !this.project;
@@ -76,6 +79,7 @@ export class ProjectFormModal implements OnInit, OnChanges {
       startDate: this.form.value.startDate,
       endDate: this.form.value.endDate,
       statusId: StatusEnum.Pending,
+      isAddDefaultBoards: this.form.value.isAddDefaultBoards,
       id: isNew ? 0 : this.project!.id,
     };
 

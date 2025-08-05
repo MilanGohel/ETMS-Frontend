@@ -12,6 +12,8 @@ import { ProjectService } from '../../../../services/project/project-service';
 import { ToastService } from '../../../../services/toast/toast.service';
 import { ProjectFormModal } from '../../components/project-form-modal/project-form-modal';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
+import e from 'express';
 
 @Component({
   selector: 'app-project-list',
@@ -31,7 +33,7 @@ export class ProjectList {
   projectList: WritableSignal<ProjectDto[] | null> = signal(null);
   selectedProject: ProjectDto | null = null;
   showModal = signal(false);
-
+  private confirmationService = inject(ConfirmationService);
   private projectService = inject(ProjectService);
   private toastService = inject(ToastService);
 
@@ -43,12 +45,16 @@ export class ProjectList {
     this.projectService.getUserProjects().subscribe(res => this.projectList.set(res.data));
   }
 
+  isEditingProject = false;
+
   openCreateModal() {
+    this.isEditingProject = false;
     this.selectedProject = null;
     this.showModal.set(true);
   }
-
+  
   openEditModal(project: ProjectDto) {
+    this.isEditingProject = true;
     this.selectedProject = project;
     this.showModal.set(true);
   }
@@ -72,7 +78,26 @@ export class ProjectList {
     });
   }
 
-  onDelete(project: ProjectDto) {
-    // Optional: add delete logic
+  onDelete(event: Event, project: ProjectDto): void {
+    this.confirmationService.confirm({
+      key: 'deleteConfirm',
+      target: event.currentTarget as EventTarget, // or event.target
+      message: 'Do you want to delete?',
+      accept: () => {
+          this.projectService.deleteProject(project.id).subscribe({
+            next: (response) => {
+              if(response.succeeded){
+                this.toastService.info("Info", response.message);
+              }
+              this.loadProjects();
+            },
+            error: (error) => {
+              this.toastService.error("Error", error?.message);
+            }
+          })
+      }
+    });
   }
+
+  
 }

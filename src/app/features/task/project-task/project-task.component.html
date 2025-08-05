@@ -1,0 +1,90 @@
+<main class="w-full flex-1 overflow-auto  max-w-sm gap-y-2 flex flex-col">
+    @for(task of tasks(); track task.id)
+    {
+    <div class="bg-primary-light text-white rounded-xl p-4 flex flex-col  ">
+
+        <!-- Middle Section: Title, Assignee, Tags -->
+        <div class="flex flex-col gap-y-3">
+            <!-- Title -->
+            <h3 class="text-lg font-semibold text-gray-100">
+                {{task.name}}
+            </h3>
+            <!-- Assignee & Tags Row -->
+            <div class="flex items-center gap-x-3 flex-wrap">
+                <!-- Group Icon -->
+                <!-- Lucide Icon: Users -->
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="text-gray-400">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg> -->
+
+                <!-- Assignee Pill -->
+                <!-- <div class="flex items-center gap-x-2 bg-primary-gray px-2 py-1 rounded-full">
+                    <img src="https://i.pravatar.cc/150?u=phoenixbaker" alt="Phoenix Baker"
+                        class="w-6 h-6 rounded-full border-2 border-gray-600">
+                    <span class="text-sm font-medium text-gray-200">Phoenix Baker</span>
+                </div> -->
+
+                <!-- Tags -->
+                <!-- <div class="mt-3 ">
+                    <span
+                        class="text-xs font-medium text-blue-300 bg-blue-900/50 px-2.5 py-0.5 rounded-full mr-1">Web</span>
+                    <span
+                        class="text-xs font-medium text-amber-300 bg-amber-900/50 px-2.5 py-0.5 rounded-full">SaaS</span>
+                </div> -->
+            </div>
+        </div>
+
+        <!-- Bottom Section: Stats -->
+        <div class="flex items-center justify-between text-sm text-gray-400">
+            <!-- Left Stats -->
+            <div class="flex items-center gap-x-4">
+                <!-- Attachments -->
+                <!-- <div class="flex items-center gap-x-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.59a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                    </svg>
+                    <span>4</span>
+                </div> -->
+                <!-- Progress -->
+                <!-- <div class="flex items-center gap-x-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="12" r="1" />
+                    </svg>
+                    <span>50%</span>
+                </div> -->
+                <!-- Comments -->
+                <!-- <div class="flex items-center gap-x-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <span>2</span>
+                </div> -->
+            </div>
+
+            <!-- Right Stat (Time) -->
+            <!-- <div class="flex items-center gap-x-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>4d</span>
+            </div> -->
+        </div>
+    </div>
+
+    }
+
+    <!-- Card Component Ends Here -->
+
+</main>

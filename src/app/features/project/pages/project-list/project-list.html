@@ -27,23 +27,20 @@
             </a>
 
             <div class="absolute top-4 right-4 flex space-x-3">
-                <button (click)="openEditModal(project)" class="text-gray-400 hover:text-sky-400 transition-colors"
-                    aria-label="Edit">
-                    <ng-icon name="lucidePen" />
-                </button>
-                <p-confirmpopup />
-                <p-button class="p-button-text text-gray-400 hover:text-red-400 transition-colors bg-transparent" ariaLabel="Delete"
-                    (onClick)="onDelete(project)">
-                    <ng-template pTemplate="icon">
-                        <ng-icon name="lucideTrash2"></ng-icon>
-                    </ng-template>
+                <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
+                    (onClick)="openEditModal(project)">
+                    
                 </p-button>
-                
-                
+                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                    (onClick)="onDelete($event, project)">
+                   
+                </p-button>
+                <p-confirmpopup key="deleteConfirm" />
+
             </div>
         </div>
         }
     </div>
 </div>
 <app-project-form-modal [visible]="showModal()" [project]="selectedProject" (onClose)="handleModalClose()"
-    (onSubmit)="handleFormSubmit($event)" />
+    (onSubmit)="handleFormSubmit($event)" [isEditing]="isEditingProject" />

@@ -37,11 +37,11 @@ export class Sidebar {
   selectedItem: string = 'dashboard';
   searchQuery: string = '';
   menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'lucideHouse', link: '/dashboard' },
-    { id: 'projects', label: 'Projects', icon: 'lucideFileText', link: '/projects' },
-    { id: 'calendar', label: 'Calendar', icon: 'lucideCalendar1', link: '/calendar' },
-    { id: 'messages', label: 'Messages', icon: 'lucideMessageCircle', link: '/messages' },
-    { id: 'files', label: 'Files', icon: 'lucideFolder', link: '/files' }
+    { id: 'dashboard', label: 'Dashboard', icon: 'lucideHouse', link: '/dashboard', routes: ['/dashboard'] },
+    { id: 'projects', label: 'Projects', icon: 'lucideFileText', link: '/projects', routes: ['/projects', 'project'] },
+    { id: 'calendar', label: 'Calendar', icon: 'lucideCalendar1', link: '/calendar', routes: ["/calender"] },
+    { id: 'messages', label: 'Messages', icon: 'lucideMessageCircle', link: '/messages', routes: ['messages'] },
+    { id: 'files', label: 'Files', icon: 'lucideFolder', link: '/files', routes: ['files'] }
   ];
 
 
@@ -51,8 +51,11 @@ export class Sidebar {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
+      ;
       const currentUrl = event.urlAfterRedirects || event.url;
-      const matchedItem = this.menuItems.find(item => currentUrl.startsWith(item.link));
+      const matchedItem = this.menuItems.find(item =>
+        item.routes.some(route => currentUrl.includes(route))
+      );
       if (matchedItem) {
         this.selectedItem = matchedItem.id;
       }
