@@ -2,7 +2,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { Component } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 
 import {
   lucideFileText,
@@ -13,6 +13,7 @@ import {
   lucideFolder,
   lucideSearch
 } from "@ng-icons/lucide";
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -42,6 +43,22 @@ export class Sidebar {
     { id: 'messages', label: 'Messages', icon: 'lucideMessageCircle', link: '/messages' },
     { id: 'files', label: 'Files', icon: 'lucideFolder', link: '/files' }
   ];
+
+
+  // ... inside @Component and class definition
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      const currentUrl = event.urlAfterRedirects || event.url;
+      const matchedItem = this.menuItems.find(item => currentUrl.startsWith(item.link));
+      if (matchedItem) {
+        this.selectedItem = matchedItem.id;
+      }
+    });
+  }
+
   toggleFilesSection() {
     this.isFilesSectionOpen = !this.isFilesSectionOpen;
   }

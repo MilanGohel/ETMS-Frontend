@@ -1,15 +1,4 @@
-export interface TaskDto {
-  name: string;
-  description?: string;
-  statusId: number;
-  boardId: number;
-}
 
-export interface BoardDto {
-  id: number,
-  name: string,
-  Tasks: TaskDto
-}
 
 export interface ApiResponse<T> {
   data: T;
@@ -43,8 +32,8 @@ export interface ProjectDto {
   id: number;
   name: string;
   description?: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   statusId: StatusEnum;
   status?: Status;
 }
@@ -52,8 +41,8 @@ export interface ProjectDto {
 export interface CreateProjectDto {
   name: string;
   description?: string;
-  startDate: string; 
-  endDate: string; 
+  startDate: Date;
+  endDate: Date;
 }
 
 
@@ -84,3 +73,37 @@ export interface SignUpRequestDto {
   email: string;
   password: string;
 }
+
+export interface CreateBoardDto {
+  name: string;
+  colorCode?: string;
+  description?: string;
+  projectId: number;
+}
+
+export interface BoardDto extends BaseEntityDto {
+  name: string;
+  colorCode: string |  null;
+  description?: string;
+  projectId: number;
+  tasks?: TaskDto[];
+}
+
+export interface BaseEntityDto {
+  id?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  isDeleted?: boolean;
+}
+
+export interface TaskDto extends BaseEntityDto {
+  name: string;
+  description?: string;
+  boardId: number;
+  statusId: StatusEnum; 
+}
+
+export interface UserNameExistsDto {
+  isUserNameExists: boolean;
+}
+

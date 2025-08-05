@@ -7,7 +7,8 @@ import { jwtDecode } from "jwt-decode";
 import { setCurrentUser } from '../../stores/current-user.actions';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser } from '../../stores/current-user.selectors';
-import { ApiResponse, CurrentUserDto, ErrorResponse, LoginRequestDto, LoginResponseDto, SignUpRequestDto } from '../../core/models';
+import { ApiResponse, CurrentUserDto, ErrorResponse, LoginRequestDto, LoginResponseDto, SignUpRequestDto, UserNameExistsDto } from '../../core/models';
+import { response } from 'express';
 
 @Injectable({
   providedIn: 'root'
@@ -67,8 +68,7 @@ export class AuthService {
     );
   }
 
-  signUp(signUpRequest: SignUpRequestDto) :Observable<ApiResponse<object> | ErrorResponse> {
-    debugger;
+  signUp(signUpRequest: SignUpRequestDto): Observable<ApiResponse<object> | ErrorResponse> {
     return this.http.post<ApiResponse<object> | ErrorResponse>(
       `${this.apiUrl}/api/auth/signup`,
       signUpRequest
@@ -88,16 +88,34 @@ export class AuthService {
       })
       ,
       catchError((error: HttpErrorResponse) => {
-        debugger;
         const failedResponse: ErrorResponse = {
           succeeded: false,
           message: error.error.message,
-          errors: [error.error],
+          errors: error.error,
           statusCode: error.status
         }
         return of(failedResponse);
       })
     )
+  }
+
+  verifyUser(token: string): Observable<ApiResponse<object> | ErrorResponse> {
+    console.log("kjfdafjkd");
+    const url = `${this.apiUrl}/api/Auth/magiclogin?token=${token}`
+
+    return this.http.post<ApiResponse<object> | ErrorResponse>(
+      url, null
+    ).pipe(
+      catchError((error: HttpErrorResponse) => {
+        const failedResponse: ErrorResponse = {
+          succeeded: false,
+          message: error.message,
+          errors: error.error,
+          statusCode: error.status
+        }
+        return of(failedResponse);
+      })
+    );
   }
 
   refreshToken(): Observable<ApiResponse<LoginResponseDto>> {

@@ -1,0 +1,37 @@
+<div class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-5 px-4">
+    <div class="flex items-center space-x-2">
+        <img ngSrc="taskk-logo.png" alt="Taskk Logo" height="35" width="35" class="rounded-md shadow-sm" />
+        <span class="text-2xl font-semibold text-gray-900 dark:text-white">Taskk</span>
+    </div>
+
+    @if (status() === 'success') {
+    <h2 class="text-green-600 dark:text-green-400 font-bold text-2xl">Email Verified Successfully</h2>
+    <p class="text-gray-700 dark:text-gray-300 text-base">Your account has been verified. You can now log in.</p>
+    <a routerLink="/login"
+        class="mt-2 inline-block px-5 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition">
+        Go to Login
+    </a>
+    }
+    @else {
+    @if (status() === 'error') {
+    <h2 class="text-red-600 dark:text-red-400 font-bold text-2xl">Verification Failed</h2>
+    <p class="text-gray-700 dark:text-gray-300 text-base">The verification link is invalid or has expired.</p>
+    <a routerLink="/"
+        class="mt-2 inline-block px-5 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">
+        Go to Home
+    </a>
+    }
+    @else{
+    <h2 class="text-yellow-600 dark:text-yellow-400 font-bold text-2xl">Invalid Request</h2>
+    <p class="text-gray-700 dark:text-gray-300 text-base">The verification link is incomplete or malformed.</p>
+    <a routerLink="/"
+        class="mt-2 inline-block px-5 py-2 rounded-md bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium transition">
+        Go to Home
+    </a>
+    }
+    }
+
+</div>
+@if(showLoader()){
+<app-loading-component />
+}

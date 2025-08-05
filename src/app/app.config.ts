@@ -4,14 +4,15 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { authInterceptor } from './interceptors/auth-interceptor';
 import { provideStore } from '@ngrx/store';
 import { currentUserReducer } from './stores/current-user.reducer';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { definePreset, palette } from '@primeuix/themes';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { authInterceptor } from './core/interceptors/auth-interceptor';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
 
 const AuraCustomDark = definePreset(Aura, {
   semantic: {
@@ -93,7 +94,10 @@ export const appConfig: ApplicationConfig = {
         tooltip: 1100   // tooltip
       }
     }),
+    
     importProvidersFrom(ToastModule),
+    importProvidersFrom(ConfirmPopupModule),
+    ConfirmationService,
     MessageService
   ]
 };

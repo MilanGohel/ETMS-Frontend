@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
-import { ApiResponse, BoardDto, ErrorResponse, ProjectDto } from '../../core/models';
+import { ApiResponse, BoardDto, CreateBoardDto, ErrorResponse, ProjectDto, TaskDto } from '../../core/models';
+import { error } from 'console';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class BoardService {
   }
 
   getBoardsByProjectId(projectId: number): Observable<ApiResponse<BoardDto[]> | ErrorResponse> {
-    
+
     const url = `${this.apiUrl}/api/Board/by-project/${projectId}`;
 
     return this.http.get<ApiResponse<BoardDto[]> | ErrorResponse>(url, { withCredentials: true }).pipe(
@@ -34,4 +35,56 @@ export class BoardService {
       })
     )
   }
+
+  createNewBoard(createNewBoard: BoardDto) {
+    const url = `${this.apiUrl}/api/Board`;
+
+    return this.http.post<ApiResponse<BoardDto> | ErrorResponse>(url, { ...createNewBoard }, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: error.error?.message,
+            errors: [error.message],
+            statusCode: error.status
+          };
+          return of(failedResponse);
+        })
+      )
+  }
+
+  updateBoard(board: BoardDto) {
+    debugger;
+    const url = `${this.apiUrl}/api/Board/${board.id}`;
+
+    return this.http.put<ApiResponse<object>>(url, { ...board }, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: error.error?.message,
+            errors: [error.message],
+            statusCode: error.status
+          };
+          return of(failedResponse);
+        })
+      )
+  }
+
+  createNewTaskOnBoard(taskDto: TaskDto) {
+    const url = `${this.apiUrl}/api/Task`;
+    return this.http.post<ApiResponse<TaskDto> | ErrorResponse>(url, { ...taskDto }, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: error.error?.message,
+            errors: [error.message],
+            statusCode: error.status
+          };
+          return of(failedResponse);
+        })
+      )
+  }
+
 }

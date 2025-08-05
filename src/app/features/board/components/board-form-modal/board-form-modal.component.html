@@ -1,0 +1,64 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '30rem'}" [contentStyle]="{'overflow': 'visible'}"
+    (onHide)="closeDialog()">
+    <ng-template #header>
+        <div class="text-xl font-bold text-gray-900 dark:text-white">
+            {{ board() ? 'Edit Board' : 'Add New Board' }}
+        </div>
+    </ng-template>
+
+    <form [formGroup]="boardForm" class="space-y-5" (ngSubmit)="submitForm()">
+        <!-- Board Name -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-700 dark:text-gray-200">Board Name</label>
+            <input pInputText formControlName="name"
+                class="w-full px-4 py-2 rounded-lg placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-700 bg-white dark:bg-primary text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary"
+                placeholder="Enter board name" />
+
+            @if (boardForm.get('name')?.touched && boardForm.get('name')?.invalid) {
+            <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                Board Name is Required.
+            </div>
+            }
+        </div>
+
+        <!-- Color Code -->
+        <div>
+            <label class="block mb-1 text-sm text-gray-700 dark:text-gray-200">Color Code</label>
+
+            <!-- Preset Color Swatches using @for -->
+            <div class="flex gap-2 mb-2 items-center">
+                <p-colorpicker formControlName="colorCode"></p-colorpicker>
+
+                <hr class="w-px h-6 mx-2 bg-gray-300 border-0">
+
+                @for (preset of presetColors; track preset) {
+                <button type="button" class="w-6 h-6 rounded-lg cursor-pointer  " [ngClass]="{
+                    'outline-secondary outline-1 outline-offset-2' : colorValue === preset
+                }" [style.background]="preset" [style.background]="preset" (click)="selectPresetColor(preset)"
+                    [attr.aria-label]="preset">
+                </button>
+                }
+            </div>
+
+
+            <!-- Error Handling using @if -->
+            @if (boardForm.get('colorCode')?.touched && boardForm.get('colorCode')?.invalid) {
+            <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                Color Code is Required.
+            </div>
+            }
+        </div>
+    </form>
+
+    <ng-template #footer>
+        <button type="button" (click)="closeDialog()"
+            class="flex items-center gap-2 bg-gray-700 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm">
+            Cancel
+        </button>
+
+        <button type="submit" (click)="submitForm()" [disabled]="boardForm.invalid"
+            class="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-md cursor-pointer hover:opacity-90 transition-opacity text-sm font-semibold">
+            Save
+        </button>
+    </ng-template>
+</p-dialog>
