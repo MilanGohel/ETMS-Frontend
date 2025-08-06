@@ -1,8 +1,8 @@
-import { Component, ElementRef, inject, input, OnChanges, OnInit, output, QueryList, signal, SimpleChanges, ViewChild, WritableSignal } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, OnChanges, OnInit, output, QueryList, signal, SimpleChanges, ViewChild, WritableSignal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideEllipsisVertical, lucidePlus } from "@ng-icons/lucide";
 import { BoardService } from '../../../../services/board/board-service';
-import { BoardDto, StatusEnum } from '../../../../core/models';
+import { BoardDto, StatusEnum, TaskDto } from '../../../../core/models';
 import { ToastService } from '../../../../services/toast/toast.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { PopoverModule } from 'primeng/popover';
@@ -10,7 +10,10 @@ import { presetColors } from '../../../../shared/constants/constant';
 import { ColorPicker } from 'primeng/colorpicker';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { ProjectTaskComponent } from '../../../task/project-task/project-task.component';
+import { ProjectTaskComponent } from '../../../task/components/project-task/project-task.component';
+import { response } from 'express';
+import { error } from 'console';
+import { TaskService } from '../../../../services/task/task-service';
 @Component({
   selector: 'app-board-component',
   imports: [NgIcon, NgStyle, PopoverModule, NgClass, ColorPicker, FormsModule, InputTextModule, FormsModule, ProjectTaskComponent],
@@ -28,6 +31,7 @@ export class BoardComponent implements OnInit {
   projectId = input<number>(0);
   showBoardModal: WritableSignal<boolean> = signal<boolean>(false);
   private boardService = inject(BoardService);
+  private taskService = inject(TaskService);
   selectedBoard: WritableSignal<BoardDto | null> = signal(null);
   toastService = inject(ToastService);
 
@@ -72,8 +76,8 @@ export class BoardComponent implements OnInit {
     })
 
     this.boards.update(prevBoards => {
-      return prevBoards.map(b => b.id === this.editingBoard()!.id? {
-       ...b,
+      return prevBoards.map(b => b.id === this.editingBoard()!.id ? {
+        ...b,
         colorCode: this.colorValue()
       } : b)
     })
@@ -82,7 +86,7 @@ export class BoardComponent implements OnInit {
       next: res => {
         if (res.succeeded) {
           console.log("Color Changed");
-         
+
           console.log(this.boards());
         }
       },
@@ -97,8 +101,6 @@ export class BoardComponent implements OnInit {
   onNameInputBlur() {
     if (this.editingBoard()?.name.trim() && this.editingBoard!.name !== this.editingBoard()?.name.trim()) {
 
-      console.log(this.editingBoard() + "edited")
-      // this.boardNameChange.emit(this.editedName.trim());
       if (!this.editingBoard()) return;
 
       this.boardService.updateBoard(this.editingBoard()!).subscribe({
@@ -130,7 +132,6 @@ export class BoardComponent implements OnInit {
     this.boardService.getBoardsByProjectId(this.projectId()).subscribe({
       next: res => {
         if (res.succeeded) {
-          console.log(JSON.stringify(res) + "result")
           this.boards.set(res.data);
         }
       },
@@ -148,6 +149,7 @@ export class BoardComponent implements OnInit {
   onAddNewTaskClick(board: BoardDto) {
     this.showAddTaskInput.set(true);
     this.editingBoard.set(board);
+    this.colorValue.set(board.colorCode ?? "");
     const taskInput = document.getElementById("newTaskInput");
     if (taskInput) {
       setTimeout(() => {
@@ -156,11 +158,36 @@ export class BoardComponent implements OnInit {
     }
   }
 
+  // get connectedBoards():string[] {
+  //   return this.boards().map((board) => `board-${board.id}`);
+  // }
+
+  connectedBoards = computed(() => this.boards().map(board => `board-${board.id}`));
+  
   onBlurNewTask() {
     if (this.newTaskInputValue) {
       const updatedBoard = structuredClone(this.editingBoard());
       if (!updatedBoard || !updatedBoard.id) return;
-      updatedBoard.tasks = [...(updatedBoard.tasks ?? []), { name: this.newTaskInputValue, boardId: updatedBoard.id, statusId: StatusEnum.Pending }];
+
+      let newTask: TaskDto = {
+        name: this.newTaskInputValue,
+        boardId: updatedBoard.id,
+        statusId: StatusEnum.Pending,
+      }
+      this.taskService.createTask(newTask).subscribe({
+        next: (response) => {
+          if (!response.succeeded) {
+            this.toastService.error("Error", response.message);
+          }
+          else {
+            newTask = response.data;
+          }
+        },
+        error: (error) => {
+          this.toastService.error("Error", error.message);
+        }
+      })
+      updatedBoard.tasks = [...(updatedBoard.tasks ?? []), { ...newTask }];
 
       // Update editing board
       this.editingBoard.set(updatedBoard);
@@ -169,13 +196,11 @@ export class BoardComponent implements OnInit {
       this.boards.update((prevBoards) =>
         prevBoards.map((b) => b.id === updatedBoard.id ? updatedBoard : b)
       );
-
-      this.newTaskInputValue = '';
-      console.log(this.boards());
-      // Optional: API call to persist
     }
 
     this.editingBoard.set(null);
+    this.newTaskInputValue = '';
+    console.log(this.boards());
   }
 
 }

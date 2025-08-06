@@ -18,12 +18,13 @@ import { CommonModule } from '@angular/common';
 import { ProjectDto, StatusEnum } from '../../../../core/models';
 import { dateRangeValidator } from '../../../../shared/validators/dateRange.validator';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-project-form-modal',
   templateUrl: './project-form-modal.html',
   styleUrls: ['./project-form-modal.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, DatePicker, DialogModule, CommonModule, CheckboxModule]
+  imports: [ReactiveFormsModule, DatePicker, DialogModule, CommonModule, CheckboxModule, ButtonModule]
 })
 export class ProjectFormModal implements OnInit, OnChanges {
   @Input() visible = false;

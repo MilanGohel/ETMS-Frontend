@@ -49,16 +49,17 @@
             </div>
         </div>
         <!-- Board Body -->
-        <div class="w-full max-h-[55vh] overflow-y-auto">
+        <div class="w-full max-h-[55vh] overflow-y-auto" >
 
             <!-- Task Component -->
+            <app-project-task [tasks]="board.tasks ?? []" [taskListId]="'board-' + board.id" [connectedBoards]="connectedBoards()"></app-project-task>
 
             @if(showAddTaskInput() && editingBoard()?.id === board.id)
             {
-                <input placeholder="Task Name" pInputText (blur)="onBlurNewTask()" id="newTaskInput" #newTaskInput
-                    [(ngModel)]="newTaskInputValue" />
+            <input placeholder="Task Name" pInputText (blur)="onBlurNewTask()" id="newTaskInput" #newTaskInput class="w-full my-2"
+                [(ngModel)]="newTaskInputValue" />
             }
-            <app-project-task [tasks]="board.tasks ?? []"></app-project-task>
+
             <!-- Card Component Ends Here -->
 
         </div>

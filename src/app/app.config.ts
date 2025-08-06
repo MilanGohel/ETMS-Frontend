@@ -78,7 +78,6 @@ export const appConfig: ApplicationConfig = {
     provideStore({
       currentUser: currentUserReducer
     }),
-    provideClientHydration(withEventReplay()),
     provideAnimations(),
     providePrimeNG({
       theme: {

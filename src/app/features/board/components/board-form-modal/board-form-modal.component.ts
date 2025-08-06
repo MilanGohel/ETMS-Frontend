@@ -1,7 +1,7 @@
 import { Component, inject, Input, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { BoardDto, ProjectDto } from '../../../../core/models';
+import { BoardDto } from '../../../../core/models';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { NgClass } from '@angular/common';
 import { presetColors } from '../../../../shared/constants/constant';
