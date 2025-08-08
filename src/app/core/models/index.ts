@@ -84,7 +84,7 @@ export interface CreateBoardDto {
 
 export interface BoardDto extends BaseEntityDto {
   name: string;
-  colorCode: string |  null;
+  colorCode: string | null;
   description?: string;
   projectId: number;
   tasks?: TaskDto[];
@@ -101,10 +101,43 @@ export interface TaskDto extends BaseEntityDto {
   name: string;
   description?: string;
   boardId: number;
-  statusId: StatusEnum; 
+  statusId: StatusEnum;
+  order: number;
+  isAddedAtEndOfBoard: boolean;
 }
 
 export interface UserNameExistsDto {
   isUserNameExists: boolean;
 }
 
+export interface UpdateTaskPositionDto {
+  taskId: number;
+  newBoardId: number;
+  newPosition: number;
+}
+export interface GoogleLoginDto {
+  accessToken: string;
+  idToken: string;
+  ipAddress?: string;
+  authProviderEnum: AuthProviderEnum.Google; // Will always be AuthProviderEnum.Google
+}
+export enum AuthProviderEnum {
+  Normal = 1,
+  Google = 2,
+  Github = 3
+}
+
+export interface ShiftTaskOrderRangeDto {
+  minOrder: number;
+  maxOrder: number;
+  boardId: number;
+  shiftAmount: number;
+}
+
+
+export interface MoveTaskDto {
+  taskIdToMove: number;
+  newBoardId: number;
+  previousTaskId?: number | null;
+  nextTaskId?: number | null;
+}

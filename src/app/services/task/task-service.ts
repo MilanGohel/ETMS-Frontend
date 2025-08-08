@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { ApiResponse, ErrorResponse, TaskDto } from '../../core/models';
+import { ApiResponse, ErrorResponse, MoveTaskDto, ShiftTaskOrderRangeDto, TaskDto, UpdateTaskPositionDto } from '../../core/models';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { response } from 'express';
@@ -11,6 +11,60 @@ import { response } from 'express';
 export class TaskService {
   http = inject(HttpClient);
   apiUrl = environment.apiUrl;
+
+  shiftTaskOrder(ShiftTaskOrderRangeDto: ShiftTaskOrderRangeDto): Observable<ApiResponse<object> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/Task/shift-range`;
+
+    return this.http.post<ApiResponse<object> | ErrorResponse>(url, { ...ShiftTaskOrderRangeDto }, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error("API Call failed for shifting task order.");
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            errors: error.error,
+            message: error.message,
+            statusCode: error.status
+          }
+          return of(failedResponse);
+        })
+      )
+  }
+
+  updateTaskPositions(UpdateTaskPositionDto: UpdateTaskPositionDto): Observable<ApiResponse<object> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/Task/update-positions`;
+    return this.http.patch<ApiResponse<object> | ErrorResponse>(url, { ...UpdateTaskPositionDto }, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error("API Call failed for updating task positions.");
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            errors: error.error,
+            message: error.message,
+            statusCode: error.status
+          }
+          return of(failedResponse);
+        })
+      )
+  }
+
+  moveTask(moveTaskDto: MoveTaskDto): Observable<ApiResponse<object> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/Task/move`;
+
+    return this.http.post<ApiResponse<object> | ErrorResponse>(url, { ...moveTaskDto }, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error("API Call failed for moving task.");
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            errors: error.error,
+            message: error.message,
+            statusCode: error.status
+          }
+          return of(failedResponse);
+        })
+      )
+
+  }
   createTask(taskDto: TaskDto): Observable<ApiResponse<TaskDto> | ErrorResponse> {
     const url = `${this.apiUrl}/api/Task`;
 

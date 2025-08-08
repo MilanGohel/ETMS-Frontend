@@ -2,7 +2,7 @@ import { Component, computed, ElementRef, inject, input, OnChanges, OnInit, outp
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideEllipsisVertical, lucidePlus } from "@ng-icons/lucide";
 import { BoardService } from '../../../../services/board/board-service';
-import { BoardDto, StatusEnum, TaskDto } from '../../../../core/models';
+import { BoardDto, StatusEnum, TaskDto, UpdateTaskPositionDto } from '../../../../core/models';
 import { ToastService } from '../../../../services/toast/toast.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { PopoverModule } from 'primeng/popover';
@@ -11,12 +11,23 @@ import { ColorPicker } from 'primeng/colorpicker';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProjectTaskComponent } from '../../../task/components/project-task/project-task.component';
-import { response } from 'express';
-import { error } from 'console';
 import { TaskService } from '../../../../services/task/task-service';
+import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDragPreview, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-board-component',
-  imports: [NgIcon, NgStyle, PopoverModule, NgClass, ColorPicker, FormsModule, InputTextModule, FormsModule, ProjectTaskComponent],
+  imports: [
+    NgIcon,
+    NgStyle,
+    PopoverModule,
+    NgClass,
+    ColorPicker,
+    FormsModule,
+    InputTextModule,
+    FormsModule,
+    ProjectTaskComponent,
+    CdkDrag,
+    DragDropModule
+  ],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
   viewProviders: [provideIcons({
@@ -28,6 +39,7 @@ import { TaskService } from '../../../../services/task/task-service';
 export class BoardComponent implements OnInit {
   @ViewChild("newTaskInput") taskInputElementRef!: QueryList<ElementRef>;
   boards: WritableSignal<BoardDto[]> = signal([]);
+  test = [1, 2, 3, 45, 6, 64, 4];
   projectId = input<number>(0);
   showBoardModal: WritableSignal<boolean> = signal<boolean>(false);
   private boardService = inject(BoardService);
@@ -143,37 +155,53 @@ export class BoardComponent implements OnInit {
 
 
   // Code Related to Tasks
-  showAddTaskInput = signal<boolean>(false);
+  showAddTaskInputAtEnd = signal<boolean>(false);
+  showAddTaskInputAtStart = signal<boolean>(false);
   newTaskInputValue = '';
 
-  onAddNewTaskClick(board: BoardDto) {
-    this.showAddTaskInput.set(true);
+  onAddNewTaskClick(board: BoardDto, showInputAtEnd: boolean) {
+    console.log('Add New Task clicked for board:', board.id);
+    if (showInputAtEnd)
+      this.showAddTaskInputAtEnd.set(true);
+    else
+      this.showAddTaskInputAtStart.set(true);
+
     this.editingBoard.set(board);
     this.colorValue.set(board.colorCode ?? "");
-    const taskInput = document.getElementById("newTaskInput");
-    if (taskInput) {
-      setTimeout(() => {
-        this.taskInputElementRef.last.nativeElement.focus();
-      }, 0);
-    }
-  }
 
+    setTimeout(() => {
+      const inputId = `new-task-input-${board.id}`;
+      console.log('Attempting to focus input with id:', inputId);
+      const inputElement = document.getElementById(inputId) as HTMLInputElement;
+      if (inputElement) {
+        inputElement.focus();
+        console.log('Input element focused successfully');
+      } else {
+        console.error(`Input element with id ${inputId} not found`);
+      }
+    }, 0);
+  }
   // get connectedBoards():string[] {
   //   return this.boards().map((board) => `board-${board.id}`);
   // }
 
   connectedBoards = computed(() => this.boards().map(board => `board-${board.id}`));
-  
-  onBlurNewTask() {
+
+  onBlurNewTask(boardId: number | undefined) {
+    if (!boardId) return;
     if (this.newTaskInputValue) {
       const updatedBoard = structuredClone(this.editingBoard());
       if (!updatedBoard || !updatedBoard.id) return;
 
+      //Find new order for new task
       let newTask: TaskDto = {
         name: this.newTaskInputValue,
         boardId: updatedBoard.id,
         statusId: StatusEnum.Pending,
+        order: 0,// will be set from backend ,
+        isAddedAtEndOfBoard: this.showAddTaskInputAtEnd() ? true : false
       }
+
       this.taskService.createTask(newTask).subscribe({
         next: (response) => {
           if (!response.succeeded) {
@@ -197,10 +225,21 @@ export class BoardComponent implements OnInit {
         prevBoards.map((b) => b.id === updatedBoard.id ? updatedBoard : b)
       );
     }
-
+    this.showAddTaskInputAtEnd.set(false);
+    this.showAddTaskInputAtStart.set(false);
     this.editingBoard.set(null);
     this.newTaskInputValue = '';
     console.log(this.boards());
   }
 
+  onBoardDrop(event: CdkDragDrop<BoardDto[]>) {
+    moveItemInArray(this.boards(), event.previousIndex, event.currentIndex);
+    console.log(event.previousIndex, event.currentIndex);
+
+  }
+
+
 }
+
+
+

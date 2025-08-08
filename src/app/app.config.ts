@@ -2,7 +2,6 @@ import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListen
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
 import { currentUserReducer } from './stores/current-user.reducer';
@@ -13,6 +12,9 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { SocialAuthServiceConfig, GoogleLoginProvider, SocialLoginModule, GoogleSigninButtonDirective, SocialAuthService } from "@abacritt/angularx-social-login";
+import { environment } from '../environments/environment.development';
+
 
 const AuraCustomDark = definePreset(Aura, {
   semantic: {
@@ -64,10 +66,28 @@ const AuraCustomDark = definePreset(Aura, {
   }
 });
 
+const googleClientId = environment.googleClientId;
 
 export const appConfig: ApplicationConfig = {
 
   providers: [
+    importProvidersFrom(SocialLoginModule),
+    importProvidersFrom(SocialAuthService),
+    
+    importProvidersFrom(GoogleSigninButtonDirective),
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(googleClientId)
+          },
+        ],
+        onError: (err) => { console.error(err) }
+      } as SocialAuthServiceConfig
+    },
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),

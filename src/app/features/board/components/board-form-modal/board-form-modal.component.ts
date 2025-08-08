@@ -7,7 +7,12 @@ import { NgClass } from '@angular/common';
 import { presetColors } from '../../../../shared/constants/constant';
 @Component({
   selector: 'app-board-form-modal',
-  imports: [DialogModule, NgClass, ReactiveFormsModule, ColorPickerModule],
+  imports: [
+    DialogModule,
+    NgClass,
+    ReactiveFormsModule,
+    ColorPickerModule
+  ],
   templateUrl: './board-form-modal.component.html',
   styleUrl: './board-form-modal.component.css'
 })

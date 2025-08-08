@@ -1,4 +1,4 @@
-<main class="w-full flex-1 overflow-auto max-w-sm gap-y-2 flex flex-col min-h-[1rem] " cdkDropList
+<main class="w-full flex-1 overflow-y-auto  max-h-[50vh]  max-w-sm gap-y-2 flex flex-col min-h-[1rem] " cdkDropList
     [cdkDropListData]="tasks()" [id]="taskListId()??''" [cdkDropListConnectedTo]="connectedBoards()"
     (cdkDropListDropped)="drop($event)">
 

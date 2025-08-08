@@ -16,9 +16,9 @@ export class ProjectTaskItemComponent {
   placeholderHeight = signal<number>(0);
 
   onDragStarted() {
-    debugger;
     const rect = this.taskItemRef.nativeElement.getBoundingClientRect()!;
     this.placeholderHeight.set(rect.height);
   }
+  
   renderer = inject(Renderer2);
 }

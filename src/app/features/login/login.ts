@@ -10,7 +10,7 @@ import { isAuthenticated } from '../../stores/current-user.selectors';
 import { AuthService } from '../../services/auth/auth-service';
 import { ApiResponse, LoginResponseDto } from '../../core/models';
 import { LoadingComponent } from '../common/loading-component/loading-component';
-
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -20,7 +20,7 @@ import { LoadingComponent } from '../common/loading-component/loading-component'
     NgOptimizedImage,
     ReactiveFormsModule,
     RouterOutlet,
-    LoadingComponent
+    LoadingComponent,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css'
@@ -36,6 +36,8 @@ export class Login implements OnInit {
 
   fb: FormBuilder = inject(FormBuilder);
   authService: AuthService = inject(AuthService);
+  // socialAuthService: SocialAuthService = inject(SocialAuthService);
+
   router: Router = inject(Router);
 
   platformId = inject(PLATFORM_ID);
@@ -48,8 +50,14 @@ export class Login implements OnInit {
       email: ['', [Validators.required, customEmailValidator()]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
-  }
 
+    // this.socialAuthService.authState.subscribe((user: SocialUser)  => {
+    //   if(user){
+    //     console.log('Logged in user: ', user);
+    //     this.authService.sendTokenToBackend(user.idToken, user.authToken)
+    //   } 
+    // })
+  }
 
   get email() {
     return this.loginForm.get('email');
@@ -93,10 +101,12 @@ export class Login implements OnInit {
     });
   }
 
-  onGoogleLogin(): void {
-    // Implement Google login
-    console.log('Google login clicked');
-  }
+  // onGoogleLogin(): void {
+  //   // Implement Google login
+  //   console.log('Google login clicked');
+
+  //   this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID);
+  // }
 
   onGithubLogin(): void {
     // Implement GitHub login

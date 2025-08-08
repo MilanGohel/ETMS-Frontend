@@ -65,7 +65,7 @@ export class ProjectService {
   }
 
   createProject(project: ProjectDto): Observable<ProjectApiResult> {
-    debugger;
+    
     const url = `${this.apiUrl}/api/Project`;
     return this.http.post<ProjectApiResult>(url,
       { ...project },

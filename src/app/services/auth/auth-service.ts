@@ -7,7 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { setCurrentUser } from '../../stores/current-user.actions';
 import { Store } from '@ngrx/store';
 import { selectCurrentUser } from '../../stores/current-user.selectors';
-import { ApiResponse, CurrentUserDto, ErrorResponse, LoginRequestDto, LoginResponseDto, SignUpRequestDto, UserNameExistsDto } from '../../core/models';
+import { ApiResponse, CurrentUserDto, ErrorResponse, GoogleLoginDto, LoginRequestDto, LoginResponseDto, SignUpRequestDto, UserNameExistsDto } from '../../core/models';
 import { response } from 'express';
 
 @Injectable({
@@ -142,6 +142,42 @@ export class AuthService {
     );
   }
 
+  loginWithGoogle(googleLoginDto: GoogleLoginDto): Observable<ApiResponse<LoginResponseDto> | ErrorResponse> {
+    return this.http.post<ApiResponse<LoginResponseDto>>(
+      `${this.apiUrl}/api/auth/login/google`,
+      googleLoginDto
+    ).pipe(
+      tap(response => {
+        if (response.succeeded) {
+          localStorage.setItem("AccessToken", response.data.accessToken);
+          localStorage.setItem("RefreshToken", response.data.refreshToken);
+        }
+      }),
+      catchError(error => {
+        console.error('Google login failed: ', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  sendTokenToBackend(idToken: string, accessToken: string): void {
+    const url = `${this.apiUrl}/api/auth/login/google`;
+    const loginData = {
+      idToken: idToken,
+      accessToken: accessToken
+    };
+
+    this.http.post(url, loginData)
+      .subscribe({
+        next: (response) => {
+          console.log('Backend login successful!', response);
+          // TODO: Save your own app's JWT from the response and navigate away.
+        },
+        error: (error) => {
+          console.error('Backend login failed:', error);
+        }
+      });
+  }
   logout(): void {
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem(this.tokenKey);
