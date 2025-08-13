@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth-service';
 import { customEmailValidator } from '../../shared/validators/email.validtor';
-import { SignUpRequestDto } from '../../core/models';
+import { AuthProviderEnum, SignUpRequestDto } from '../../core/models';
 import { userNameExistsValidator, userNameValidator } from '../../shared/validators/user-name.validator';
 import { Message } from "primeng/message";
 import { UserService } from '../../services/user/user-service';
@@ -44,7 +44,8 @@ export class Signup implements OnInit {
           asyncValidators: [userNameExistsValidator(this.userService)],
           updateOn: 'blur'
         }
-      )
+      ),
+      authProvider: AuthProviderEnum.Normal
     })
   }
 

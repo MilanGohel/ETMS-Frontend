@@ -1,0 +1,58 @@
+/* src/styles.css */
+
+/*
+ * NGX-EDITOR DARK THEME OVERRIDE
+ */
+
+/* Main wrapper for the editor */
+.NgxEditor__Wrapper {
+    border-color: #555;
+    /* Darker border */
+}
+
+/* The toolbar (menu bar) */
+.NgxEditor__MenuBar {
+    background-color: #2a2a2e;
+    /* Dark background for the toolbar */
+    border-color: #555;
+}
+
+/* Toolbar buttons */
+.NgxEditor__MenuItem {
+    color: #d1d1d1;
+    /* Light gray icon/text color for buttons */
+}
+
+/* Toolbar button on hover */
+.NgxEditor__MenuItem:hover {
+    background-color: #3f3f46;
+    /* Slightly lighter background on hover */
+    color: #fff;
+    /* White icon/text on hover */
+}
+
+/* Active/selected toolbar button */
+.NgxEditor__MenuItem.NgxEditor__MenuItem--Active {
+    background-color: #007acc;
+    /* A highlight color for active state */
+    color: #fff;
+}
+
+/* The main content area where you type */
+.NgxEditor__Content {
+    background-color: #1e1e1e;
+    /* Dark background for the content area */
+    color: #e0e0e0;
+    /* Light text color for readability */
+}
+
+/* Set the placeholder text color */
+.NgxEditor__Content[data-placeholder]:before {
+    color: #6c6c6c;
+}
+
+:host ::ng-deep .NgxEditor__Content {
+  min-height: 200px;
+  max-height: 600px;
+  overflow-y: auto;
+}

@@ -5,13 +5,15 @@ import { BoardDto } from '../../../../core/models';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { NgClass } from '@angular/common';
 import { presetColors } from '../../../../shared/constants/constant';
+import { NgxEditorModule } from 'ngx-editor';
 @Component({
   selector: 'app-board-form-modal',
   imports: [
     DialogModule,
     NgClass,
     ReactiveFormsModule,
-    ColorPickerModule
+    ColorPickerModule,
+   
   ],
   templateUrl: './board-form-modal.component.html',
   styleUrl: './board-form-modal.component.css'
@@ -32,7 +34,7 @@ export class BoardFormModalComponent implements OnInit {
 
   boardForm = this.fb.group({
     name: ['', Validators.required],
-    colorCode: ['', Validators.required],
+    colorCode: ['#ffffff', Validators.required],
     projectId: [this.projectId],
   })
 
@@ -57,13 +59,16 @@ export class BoardFormModalComponent implements OnInit {
   }
 
   submitForm() {
+    
     if (this.boardForm.valid) {
       const board: BoardDto = {
         name: this.boardForm.value.name!.trim(),
         colorCode: this.colorCode!.value,
-        projectId: this.projectId()
+        projectId: this.projectId(),
+        tasks: [] // Assuming tasks are not included in the form
       };
       this.onSubmit.emit(board);
+      this.boardForm.reset();
     }
   }
 }

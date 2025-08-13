@@ -1,90 +1,86 @@
-<div class="rounded-xl shadow-sm flex flex-row justify-start  gap-x-3 overflow-x-auto max-w-screen h-full" cdkDropList
-    [cdkDropListData]="boards()" (cdkDropListDropped)="onBoardDrop($event)" cdkDropListOrientation="horizontal"
-    >
+<div class="flex h-full max-w-screen flex-row justify-start gap-x-3 overflow-x-auto" cdkDropList
+    [cdkDropListData]="boards()" (cdkDropListDropped)="onBoardDrop($event)" cdkDropListOrientation="horizontal">
+    @for (board of boards(); track board.id) {
+    <div cdkDrag class="h-fit bg-transparent" [cdkDragData]="board"
+        [cdkDragDisabled]="editingBoard() !== null || showAddTaskInputForBoard().id !== null">
+        <div
+            class="flex min-w-[23em] flex-col items-center gap-1 space-x-2 rounded-lg bg-black p-3 text-sm text-gray-700 shadow-lg dark:text-gray-100">
+            <div class="flex w-full flex-row justify-between px-1 py-2">
+                <div class="flex flex-row items-center gap-2">
+                    <div class="h-5 w-2 rounded-md" [ngStyle]="{ 'background-color': board.colorCode }"></div>
 
-    @for (board of boards()!; track board.id) {
-    <div cdkDrag>
-        <div 
-            class="flex flex-col  gap-1 items-center space-x-2 text-sm dark:text-gray-100 text-gray-700  min-w-[23em] p-3  bg-black rounded-lg shadow-lg">
-
-            <!-- Board Header -->
-            <div class="flex flex-row justify-between py-2 px-1 w-full">
-                <div class="flex flex-row gap-2">
-                    <div class="w-2 h-5 rounded-md"
-                        [ngStyle]="{ 'background-color': isOptionsPopoverOpen()  && editingBoard()?.id === board.id ? colorValue() :board.colorCode }">
-                    </div>
-                    @if(editingBoard() && editingBoard()?.id === board.id && isNameEditing())
-                    {
-                    <input type="text" [value]="editingBoard()?.name" (input)="onEditNameInput($event)"
-                        [id]="'board-name-input-' + board.id" (keydown.enter)="onNameInputBlur()"
-                        (blur)="onNameInputBlur()" />
-                    }
-                    @else {
-                    <span class="font-semibold" (click)="onNameDblClick(board)">{{board!.name}}</span>
+                    @if(editingBoard()?.id === board.id) {
+                    <input type="text" pInputText [value]="editingBoard()?.name" (input)="onBoardNameChange($event)"
+                        (keydown.enter)="onBoardNameBlur()" (blur)="onBoardNameBlur()"
+                        [id]="'board-name-input-' + board.id" class="w-full" />
+                    } @else {
+                    <span class="font-semibold" (dblclick)="onNameDblClick(board)">{{ board.name }}</span>
                     }
 
-                    <span class="bg-primary-gray px-2 py-0.5 rounded-full text-xs font-medium ">3</span>
+                    <span class="rounded-full bg-primary-gray px-2 py-0.5 text-xs font-medium">
+                        {{ board.tasks.length }}
+                    </span>
                 </div>
-                <div class="flex flex-row gap-2">
-                    <button (click)="onAddNewTaskClick(board, false)">
+
+                <div class="flex flex-row items-center gap-2">
+                    <button (click)="onAddNewTaskClick(board.id??0, 'start')">
                         <ng-icon name="lucidePlus" class="text-xl" />
                     </button>
-                    <button
-                        (click)="options.toggle($event); editingBoard.set(board); colorValue.set(editingBoard()?.colorCode ?? '#ffffff')"
-                        class="cursor-pointer">
+                    <button (click)="options.toggle($event)" class="cursor-pointer">
                         <ng-icon name="lucideEllipsisVertical" class="text-xl" />
                     </button>
-                    <p-popover #options (onHide)="onBoardColorChange()" (onShow)="isOptionsPopoverOpen.set(true)">
-                        <h2 class="font-semibold">Colors</h2>
-                        <div class="flex gap-2 mb-2 items-center">
-                            <p-colorpicker [ngModel]="colorValue()"
-                                (ngModelChange)="colorValue.set($event)"></p-colorpicker>
 
-                            <hr class="w-px h-6 mx-2 bg-gray-300 border-0">
+                    <p-popover #options>
+                        <h2 class="font-semibold">Colors</h2>
+                        <div class="mb-2 flex items-center gap-2">
+                            <p-colorpicker format="hex" [ngModel]="board.colorCode"
+                                (ngModelChange)="onBoardColorChange($event, board)">
+                            </p-colorpicker>
+
+                            <hr class="mx-2 h-6 w-px border-0 bg-gray-300" />
 
                             @for (preset of presetColors; track preset) {
-                            <button type="button" class="w-6 h-6 rounded-lg cursor-pointer  " [ngClass]="{
-                                'outline-secondary outline-1 outline-offset-2' : colorValue() === preset
-                            }" [style.background]="preset" [style.background]="preset"
-                                (click)="selectPresetColor(preset)" [attr.aria-label]="preset">
-                            </button>
+                            <button type="button" class="h-6 w-6 cursor-pointer rounded-lg"
+                                [ngClass]="{ 'outline-secondary outline-1 outline-offset-2': board.colorCode === preset }"
+                                [style.background]="preset" (click)="onBoardColorChange(preset, board)"
+                                [attr.aria-label]="preset"></button>
                             }
                         </div>
                     </p-popover>
                 </div>
             </div>
-            <!-- Board Body -->
-            <div class="w-full overflow-y-auto max-h-[50vh]">
-                @if(showAddTaskInputAtStart() && editingBoard()?.id === board.id)
-                {
-                <input placeholder="Task Name" pInputText (blur)="onBlurNewTask(board.id)"
-                    [id]="'new-task-input-' + board.id" #newTaskInput class="w-full my-2"
-                    [(ngModel)]="newTaskInputValue" />
+
+            <div class="max-h-[70vh] w-full overflow-y-auto">
+                @if(showAddTaskInputForBoard().id === board.id && showAddTaskInputForBoard().position === 'start') {
+                <input #newTaskInput pInputText placeholder="Task Name" class="my-2 w-full"
+                    [id]="'new-task-input-' + board.id" [ngModel]="newTaskInputValue()"
+                    (ngModelChange)="newTaskInputValue.set($event)" (blur)="onBlurNewTask(board.id)"
+                    (keydown.enter)="onBlurNewTask(board.id)" />
                 }
-                <!-- Task Component -->
-                <app-project-task [tasks]="board.tasks ?? []" [taskListId]="'board-' + board.id"
+
+                <app-project-task [tasks]="board.tasks" [taskListId]="'board-' + board.id"
                     [connectedBoards]="connectedBoards()"></app-project-task>
 
-                @if(showAddTaskInputAtEnd() && editingBoard()?.id === board.id)
-                {
-                <input placeholder="Task Name" pInputText (blur)="onBlurNewTask(board.id)"
-                    [id]="'new-task-input-' + board.id" #newTaskInput class="w-full my-2"
-                    [(ngModel)]="newTaskInputValue" />
+                @if(showAddTaskInputForBoard().id === board.id && showAddTaskInputForBoard().position === 'end') {
+                <input #newTaskInput pInputText placeholder="Task Name" class="my-2 w-full"
+                    [id]="'new-task-input-' + board.id" [ngModel]="newTaskInputValue()"
+                    (ngModelChange)="newTaskInputValue.set($event)" (blur)="onBlurNewTask(board.id)"
+                    (keydown.enter)="onBlurNewTask(board.id)" />
                 }
-                <!-- Card Component Ends Here -->
-
             </div>
-            <!-- Board Footer -->
-            <div class="flex items-center justify-left w-full">
-                <button (click)="onAddNewTaskClick(board, true)"
-                    class="flex items-center gap-1 cursor-pointer hover:bg-gray-950 px-3 py-2 rounded-lg transition-all ">
+
+            <div class="flex w-full items-center justify-start">
+                <button (click)="onAddNewTaskClick(board.id ?? 0 , 'end')"
+                    class="flex items-center gap-1 rounded-lg px-3 py-2 transition-all hover:bg-gray-950">
                     <ng-icon name="lucidePlus" class="text-xl" />
                     Add New
                 </button>
             </div>
-
-            
         </div>
     </div>
     }
 </div>
+
+<app-project-task-edit-modal [visible]="boardStateService.isTaskEditModalVisible()"
+    [editingTask]="boardStateService.editingTask()" (close)="boardStateService.selectTaskForEditing(null);">
+</app-project-task-edit-modal>

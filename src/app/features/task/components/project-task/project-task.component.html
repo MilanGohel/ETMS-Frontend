@@ -1,11 +1,11 @@
-<main class="w-full flex-1 overflow-y-auto  max-h-[50vh]  max-w-sm gap-y-2 flex flex-col min-h-[1rem] " cdkDropList
-    [cdkDropListData]="tasks()" [id]="taskListId()??''" [cdkDropListConnectedTo]="connectedBoards()"
-    (cdkDropListDropped)="drop($event)">
+<main class="flex min-h-[1rem] w-full max-w-sm flex-1 flex-col gap-y-2 overflow-y-auto" cdkDropList
+    [id]="taskListId() ?? ''" [cdkDropListData]="tasks()" [cdkDropListConnectedTo]="connectedBoards()"
+    (cdkDropListDropped)="boardStateService.moveTask($event)">
 
     @for(task of tasks(); track task.id) {
-        <app-project-task-item [task]="task" #taskItem></app-project-task-item>
+    <app-project-task-item [task]="task" (onTaskClick)="boardStateService.selectTaskForEditing($event)" cdkDrag
+        [cdkDragData]="task" [cdkDragDisabled]="boardStateService.isBoardDragDisabled()">
+    </app-project-task-item>
     }
-
-    <!-- Card Component Ends Here -->
-
 </main>
+

@@ -30,6 +30,26 @@ export class TaskService {
       )
   }
 
+  updateTask(taskDto: TaskDto): Observable<ApiResponse<object> | ErrorResponse> {
+    debugger;
+    const url = `${this.apiUrl}/api/Task/${taskDto.id}`
+
+    return this.http.put<ApiResponse<object> | ErrorResponse>(url, { ...taskDto }, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          
+          console.error("API Call failed for shifting task order.");
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            errors: error.error,
+            message: error.error.message,
+            statusCode: error.status
+          }
+          return of(failedResponse);
+        })
+      )
+  }
+
   updateTaskPositions(UpdateTaskPositionDto: UpdateTaskPositionDto): Observable<ApiResponse<object> | ErrorResponse> {
     const url = `${this.apiUrl}/api/Task/update-positions`;
     return this.http.patch<ApiResponse<object> | ErrorResponse>(url, { ...UpdateTaskPositionDto }, { withCredentials: true })
@@ -47,8 +67,8 @@ export class TaskService {
       )
   }
 
-  moveTask(moveTaskDto: MoveTaskDto): Observable<ApiResponse<object> | ErrorResponse> {
-    const url = `${this.apiUrl}/api/Task/move`;
+  moveTask(taskId: number, moveTaskDto: MoveTaskDto): Observable<ApiResponse<object> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/Task/move/${taskId}`;
 
     return this.http.post<ApiResponse<object> | ErrorResponse>(url, { ...moveTaskDto }, { withCredentials: true })
       .pipe(

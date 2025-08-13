@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { CurrentUserDto } from '../core/models';
+import { CurrentUserDto } from '../../core/models';
 
 export const setCurrentUser = createAction(
   '[CurrentUser] Set',

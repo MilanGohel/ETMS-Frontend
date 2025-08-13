@@ -5,6 +5,8 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { error } from 'console';
 import { ApiResponse, CreateProjectDto, ErrorResponse, ProjectDto } from '../../core/models';
+import { debugPort } from 'process';
+import { response } from 'express';
 
 
 type ProjectApiResult = ApiResponse<ProjectDto> | ErrorResponse;
@@ -22,12 +24,33 @@ export class ProjectService {
     private router: Router
   ) { }
 
+  private formatDateToDateOnlyString(date: Date | string): string {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
   getUserProjects(): Observable<ApiResponse<ProjectDto[]>> {
     const url = `${this.apiUrl}/api/project/users/current`;
 
     return this.http.get<ApiResponse<ProjectDto[]>>(url, {
       withCredentials: true
     }).pipe(
+      tap(response => {
+        if (!response.succeeded) {
+          const failedResponse: ApiResponse<ProjectDto[]> = {
+            succeeded: false,
+            message: 'Could not load projects. Please try again later.',
+            data: [],
+            errors: [response.message],
+            statusCode: 400,
+          };
+          return of(failedResponse);
+        }
+
+        return response;
+      }),
       catchError((error: HttpErrorResponse) => {
         console.error('API call failed to get user projects:', error);
 
@@ -66,9 +89,14 @@ export class ProjectService {
 
   createProject(project: ProjectDto): Observable<ProjectApiResult> {
     
+    const dates = {
+      startDate: this.formatDateToDateOnlyString(project.startDate.toString()),
+      endDate: this.formatDateToDateOnlyString(project.endDate.toString())
+    }
+
     const url = `${this.apiUrl}/api/Project`;
     return this.http.post<ProjectApiResult>(url,
-      { ...project },
+      { ...project, ...dates },
       { withCredentials: true }
     )
       .pipe(
@@ -88,8 +116,12 @@ export class ProjectService {
 
   updateProject(project: ProjectDto): Observable<ProjectApiResult> {
     const url = `${this.apiUrl}/api/Project/${project.id}`;
+    const dates = {
+      startDate: this.formatDateToDateOnlyString(project.startDate.toString()),
+      endDate: this.formatDateToDateOnlyString(project.endDate.toString())
+    }
     return this.http.put<ProjectApiResult>(url,
-      { ...project },
+      { ...project, ...dates },
       { withCredentials: true }
     )
       .pipe(

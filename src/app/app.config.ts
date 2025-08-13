@@ -4,7 +4,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
-import { currentUserReducer } from './stores/current-user.reducer';
+import { currentUserReducer } from './stores/user-store/current-user.reducer';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { definePreset, palette } from '@primeuix/themes';
@@ -14,6 +14,7 @@ import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { SocialAuthServiceConfig, GoogleLoginProvider, SocialLoginModule, GoogleSigninButtonDirective, SocialAuthService } from "@abacritt/angularx-social-login";
 import { environment } from '../environments/environment.development';
+import { NgxEditorModule } from 'ngx-editor';
 
 
 const AuraCustomDark = definePreset(Aura, {
@@ -71,10 +72,23 @@ const googleClientId = environment.googleClientId;
 export const appConfig: ApplicationConfig = {
 
   providers: [
+
     importProvidersFrom(SocialLoginModule),
     importProvidersFrom(SocialAuthService),
-    
     importProvidersFrom(GoogleSigninButtonDirective),
+    importProvidersFrom(
+      NgxEditorModule.forRoot({
+        locals: {
+          // ... all your other correct labels
+          bold: 'Bold',
+          italic: 'Italic',
+          // ... etc.
+          text_color: 'Text Color',
+          // CORRECTED: This should be a text label
+          background_color: 'Background Color',
+        }
+      }),
+    ),
     {
       provide: 'SocialAuthServiceConfig',
       useValue: {

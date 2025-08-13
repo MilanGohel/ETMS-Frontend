@@ -62,6 +62,7 @@ export class ProjectList {
   }
 
   handleFormSubmit(data: ProjectDto) {
+    
     const isNew = data.id <= 0;
     const req = isNew ? this.projectService.createProject(data) : this.projectService.updateProject(data);
 

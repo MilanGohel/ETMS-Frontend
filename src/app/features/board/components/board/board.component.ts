@@ -1,245 +1,106 @@
-import { Component, computed, ElementRef, inject, input, OnChanges, OnInit, output, QueryList, signal, SimpleChanges, ViewChild, WritableSignal } from '@angular/core';
+// src/app/components/board/board.component.ts
+import { Component, computed, ElementRef, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideEllipsisVertical, lucidePlus } from "@ng-icons/lucide";
-import { BoardService } from '../../../../services/board/board-service';
-import { BoardDto, StatusEnum, TaskDto, UpdateTaskPositionDto } from '../../../../core/models';
-import { ToastService } from '../../../../services/toast/toast.service';
+import { BoardDto } from '../../../../core/models';
 import { NgClass, NgStyle } from '@angular/common';
 import { PopoverModule } from 'primeng/popover';
 import { presetColors } from '../../../../shared/constants/constant';
-import { ColorPicker } from 'primeng/colorpicker';
+import { ColorPickerModule } from 'primeng/colorpicker';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProjectTaskComponent } from '../../../task/components/project-task/project-task.component';
-import { TaskService } from '../../../../services/task/task-service';
-import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDragPreview, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { BoardStateService } from '../../../../services/board/board-state-service';
+import { ProjectTaskEditModal } from "../../../task/components/project-task-edit-modal/project-task-edit-modal";
+
 @Component({
   selector: 'app-board-component',
+  standalone: true, // Assuming standalone for modern Angular
   imports: [
-    NgIcon,
-    NgStyle,
-    PopoverModule,
-    NgClass,
-    ColorPicker,
-    FormsModule,
-    InputTextModule,
-    FormsModule,
-    ProjectTaskComponent,
-    CdkDrag,
-    DragDropModule
-  ],
+    NgIcon, NgStyle, NgClass, FormsModule,
+    PopoverModule, ColorPickerModule, InputTextModule,
+    ProjectTaskComponent, DragDropModule,
+    ProjectTaskEditModal
+],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
-  viewProviders: [provideIcons({
-    lucidePlus,
-    lucideEllipsisVertical
-  })],
+  viewProviders: [provideIcons({ lucidePlus, lucideEllipsisVertical })],
 })
-
 export class BoardComponent implements OnInit {
-  @ViewChild("newTaskInput") taskInputElementRef!: QueryList<ElementRef>;
-  boards: WritableSignal<BoardDto[]> = signal([]);
-  test = [1, 2, 3, 45, 6, 64, 4];
-  projectId = input<number>(0);
-  showBoardModal: WritableSignal<boolean> = signal<boolean>(false);
-  private boardService = inject(BoardService);
-  private taskService = inject(TaskService);
-  selectedBoard: WritableSignal<BoardDto | null> = signal(null);
-  toastService = inject(ToastService);
+  projectId = input.required<number>();
 
-  boardEdit = output<BoardDto>();
-  boardCreate = output<void>();
+  // Injected state service
+  boardStateService = inject(BoardStateService);
 
-  isNameEditing = signal<boolean>(false);
-  isOptionsPopoverOpen = signal<boolean>(false);
+  // Component state now sourced from the service
+  boards = this.boardStateService.boards;
+  connectedBoards = this.boardStateService.connectedBoardIds;
 
+  // Local UI state signals
   editingBoard: WritableSignal<BoardDto | null> = signal(null);
+  newTaskInputValue = signal('');
+  showAddTaskInputForBoard = signal<{ id: number | null, position: 'start' | 'end' }>({ id: null, position: 'end' });
 
-  presetColors = presetColors;
-  colorValue = signal<string>('');
-
-  selectPresetColor(preset: string) {
-    this.colorValue.set(preset);
-  }
-
-  onNameDblClick(board: BoardDto) {
-    this.editingBoard.set(board);
-    this.isNameEditing.set(true);
-    setTimeout(() => {
-      // Focus the input after it's visible
-      const input = document.getElementById('board-name-input');
-      if (input) {
-        (input as HTMLInputElement).focus();
-      }
-    }, 100);
-  }
-
-  onEditNameInput(event: Event) {
-    this.editingBoard.update((previous) => {
-      return { ...previous, name: (event.target as HTMLInputElement)?.value } as BoardDto;
-    })
-  }
-
-  onBoardColorChange() {
-    if (!this.editingBoard()) return;
-
-    this.editingBoard.update(prev => {
-      return { ...prev, colorCode: this.colorValue() } as BoardDto
-    })
-
-    this.boards.update(prevBoards => {
-      return prevBoards.map(b => b.id === this.editingBoard()!.id ? {
-        ...b,
-        colorCode: this.colorValue()
-      } : b)
-    })
-
-    this.boardService.updateBoard(this.editingBoard()!).subscribe({
-      next: res => {
-        if (res.succeeded) {
-          console.log("Color Changed");
-
-          console.log(this.boards());
-        }
-      },
-      error: error => {
-        this.toastService.error("Error", error.message);
-      }
-    })
-
-    this.editingBoard.set(null); this.colorValue.set('');
-  }
-
-  onNameInputBlur() {
-    if (this.editingBoard()?.name.trim() && this.editingBoard!.name !== this.editingBoard()?.name.trim()) {
-
-      if (!this.editingBoard()) return;
-
-      this.boardService.updateBoard(this.editingBoard()!).subscribe({
-        next: res => {
-          if (res.succeeded) {
-            console.log("Name Changed");
-          }
-        },
-        error: error => {
-          this.toastService.error("Error", error.message);
-        }
-      })
-
-      this.editingBoard.set(null);
-      this.isNameEditing.set(false);
-    }
-  }
-
+  readonly presetColors = presetColors;
 
   ngOnInit(): void {
-    if (!this.projectId) {
-      console.error('projectId is undefined or invalid');
-      return;
+    this.boardStateService.loadBoards(this.projectId());
+  }
+
+  // --- Board Edit Events ---
+
+  onNameDblClick(board: BoardDto): void {
+    this.editingBoard.set({ ...board }); // Create a copy for editing
+  }
+
+  onBoardNameChange(event: Event): void {
+    const newName = (event.target as HTMLInputElement).value;
+    this.editingBoard.update(board => board ? { ...board, name: newName } : null);
+  }
+
+  onBoardNameBlur(): void {
+    const board = this.editingBoard();
+    if (board && board.name.trim()) {
+      this.boardStateService.updateBoard(board);
     }
-    this.loadBoards()
+    this.editingBoard.set(null);
   }
 
-  loadBoards() {
-    this.boardService.getBoardsByProjectId(this.projectId()).subscribe({
-      next: res => {
-        if (res.succeeded) {
-          this.boards.set(res.data);
-        }
-      },
-      error: err => {
-        console.error('Board loading failed', err);
-      }
-    });
+  onBoardColorChange(color: string, board: BoardDto): void {
+    const updatedBoard = { ...board, colorCode: color };
+    this.boardStateService.updateBoard(updatedBoard);
   }
 
+  // --- Task Creation Events ---
 
-  // Code Related to Tasks
-  showAddTaskInputAtEnd = signal<boolean>(false);
-  showAddTaskInputAtStart = signal<boolean>(false);
-  newTaskInputValue = '';
-
-  onAddNewTaskClick(board: BoardDto, showInputAtEnd: boolean) {
-    console.log('Add New Task clicked for board:', board.id);
-    if (showInputAtEnd)
-      this.showAddTaskInputAtEnd.set(true);
-    else
-      this.showAddTaskInputAtStart.set(true);
-
-    this.editingBoard.set(board);
-    this.colorValue.set(board.colorCode ?? "");
-
+  onAddNewTaskClick(boardId: number, position: 'start' | 'end'): void {
+    this.showAddTaskInputForBoard.set({ id: boardId, position });
     setTimeout(() => {
-      const inputId = `new-task-input-${board.id}`;
-      console.log('Attempting to focus input with id:', inputId);
-      const inputElement = document.getElementById(inputId) as HTMLInputElement;
-      if (inputElement) {
-        inputElement.focus();
-        console.log('Input element focused successfully');
-      } else {
-        console.error(`Input element with id ${inputId} not found`);
-      }
+      const inputElement = document.getElementById(`new-task-input-${boardId}`);
+      inputElement?.focus();
     }, 0);
   }
-  // get connectedBoards():string[] {
-  //   return this.boards().map((board) => `board-${board.id}`);
-  // }
 
-  connectedBoards = computed(() => this.boards().map(board => `board-${board.id}`));
-
-  onBlurNewTask(boardId: number | undefined) {
-    if (!boardId) return;
-    if (this.newTaskInputValue) {
-      const updatedBoard = structuredClone(this.editingBoard());
-      if (!updatedBoard || !updatedBoard.id) return;
-
-      //Find new order for new task
-      let newTask: TaskDto = {
-        name: this.newTaskInputValue,
-        boardId: updatedBoard.id,
-        statusId: StatusEnum.Pending,
-        order: 0,// will be set from backend ,
-        isAddedAtEndOfBoard: this.showAddTaskInputAtEnd() ? true : false
-      }
-
-      this.taskService.createTask(newTask).subscribe({
-        next: (response) => {
-          if (!response.succeeded) {
-            this.toastService.error("Error", response.message);
-          }
-          else {
-            newTask = response.data;
-          }
-        },
-        error: (error) => {
-          this.toastService.error("Error", error.message);
-        }
-      })
-      updatedBoard.tasks = [...(updatedBoard.tasks ?? []), { ...newTask }];
-
-      // Update editing board
-      this.editingBoard.set(updatedBoard);
-
-      // Update board in boards list
-      this.boards.update((prevBoards) =>
-        prevBoards.map((b) => b.id === updatedBoard.id ? updatedBoard : b)
-      );
+  onBlurNewTask(boardId: number | undefined): void {
+    if (!boardId || !this.newTaskInputValue().trim()) {
+      this.resetNewTaskState();
+      return;
     }
-    this.showAddTaskInputAtEnd.set(false);
-    this.showAddTaskInputAtStart.set(false);
-    this.editingBoard.set(null);
-    this.newTaskInputValue = '';
-    console.log(this.boards());
+    const { position } = this.showAddTaskInputForBoard();
+    this.boardStateService.createTask(boardId, this.newTaskInputValue(), position === 'end');
+    this.resetNewTaskState();
   }
 
-  onBoardDrop(event: CdkDragDrop<BoardDto[]>) {
-    moveItemInArray(this.boards(), event.previousIndex, event.currentIndex);
-    console.log(event.previousIndex, event.currentIndex);
-
+  private resetNewTaskState(): void {
+    this.showAddTaskInputForBoard.set({ id: null, position: 'end' });
+    this.newTaskInputValue.set('');
   }
 
+  // --- Drag and Drop Events ---
 
+  onBoardDrop(event: CdkDragDrop<BoardDto[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    this.boardStateService.moveBoard(event.previousIndex, event.currentIndex);
+  }
 }
-
-
-

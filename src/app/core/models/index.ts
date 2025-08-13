@@ -5,7 +5,7 @@ export interface ApiResponse<T> {
   message: string;
   errors: string[];
   succeeded: boolean;
-  statusCode: number;
+  statusCode: number ;
 }
 
 export interface ErrorResponse {
@@ -87,7 +87,8 @@ export interface BoardDto extends BaseEntityDto {
   colorCode: string | null;
   description?: string;
   projectId: number;
-  tasks?: TaskDto[];
+  tasks: TaskDto[];
+  
 }
 
 export interface BaseEntityDto {
@@ -102,10 +103,16 @@ export interface TaskDto extends BaseEntityDto {
   description?: string;
   boardId: number;
   statusId: StatusEnum;
-  order: number;
   isAddedAtEndOfBoard: boolean;
+  previousTaskId?: number;
+  nextTaskId?: number;
 }
 
+export interface MoveBoardDto{
+  previousBoardId?: number;
+  nextBoardId?: number;
+
+}
 export interface UserNameExistsDto {
   isUserNameExists: boolean;
 }
@@ -136,7 +143,6 @@ export interface ShiftTaskOrderRangeDto {
 
 
 export interface MoveTaskDto {
-  taskIdToMove: number;
   newBoardId: number;
   previousTaskId?: number | null;
   nextTaskId?: number | null;

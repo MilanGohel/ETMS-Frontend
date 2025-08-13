@@ -19,8 +19,8 @@ export const routes: Routes = [
                 component: ProjectList,
             },
             {
-                path:'project/:id',
-                component: ProjectDetails
+                path: 'project/:id',
+                component: ProjectDetails,
             }
         ],
         canActivate: [AuthGuard]

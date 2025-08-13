@@ -1,7 +1,8 @@
-<div cdkDrag (mousedown)="onDragStarted()" #taskItemRef>
-    <div class="bg-primary text-white rounded-xl p-4 flex flex-col" >
+<div (mousedown)="onDragStarted()" #taskItemRef class="" (click)="this.onTaskClick.emit(task())">
+    <div class="bg-primary text-white rounded-xl p-4 flex flex-col hover:bg-primary-gray cursor-pointer">
         <!-- Drag Placeholder -->
-        <div *cdkDragPlaceholder #placeholderRef class="bg-primary-light rounded-xl mb-2 w-full" [style.height.px]="placeholderHeight()">
+        <div *cdkDragPlaceholder #placeholderRef class="bg-primary-light rounded-xl mb-2 w-full"
+            [style.height.px]="placeholderHeight()">
         </div>
         <!-- Middle Section: Title, Assignee, Tags -->
         <div class="flex flex-col gap-y-3">

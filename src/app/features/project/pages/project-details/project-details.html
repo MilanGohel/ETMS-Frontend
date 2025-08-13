@@ -97,7 +97,7 @@
         </div>
         <div class="flex-1">
             <!-- Board Code starts -->
-            <app-board-component [projectId]="projectId" (boardEdit)="openEditBoardModal($event)"
+            <app-board-component [projectId]="projectId" 
                 (boardCreate)="openCreateBoardModal()" #boardComp></app-board-component>
         </div>
         <app-board-form-modal [visible]="showBoardModal()" [board]="selectedBoard()" (onSubmit)="onBoardSubmit($event)"

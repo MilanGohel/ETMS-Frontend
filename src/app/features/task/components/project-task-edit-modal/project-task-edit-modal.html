@@ -1,0 +1,34 @@
+<p-dialog [visible]="boardStateService.isTaskEditModalVisible()" [modal]="true" [draggable]="false" [style]="{ width: '50rem' }"
+    [contentStyle]="{'overflow': 'visible'}" (onHide)="onCloseDialog()">
+    <ng-template #header>
+        <div class="text-xl font-bold text-gray-900 dark:text-white">Todo Details</div>
+    </ng-template>
+
+    <!-- The form now contains the markdown editor -->
+    <form class="space-y-5" draggable="false" [formGroup]="taskForm">
+        <!-- Task Name -->
+        <div class="text-lg font-bold text-gray-900 dark:text-white">
+            {{ editingTask()?.name }}
+        </div>
+
+        <!-- Markdown Editor for Description -->
+        <!-- Replace the textarea with this component -->
+        <label for="description"> Description</label>
+        <div class="NgxEditor__Wrapper">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar" class="bg-black"> </ngx-editor-menu>
+            <ngx-editor [editor]="editor" formControlName="description" [style]="{height:'600px'}"> </ngx-editor>
+        </div>
+    </form>
+
+    <ng-template #footer>
+        <p-button label="Cancel" (onClick)="onCloseDialog()" severity="secondary" [outlined]="true"
+            [style]="{ color: 'white' }" />
+        <p-button label="Save" (onClick)="onSubmitForm()" severity="primary" [style]="{ color: 'white' }">
+        </p-button>
+
+        <!-- <button (click)="onSubmitForm()" type="submit"
+            class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-700 transition-colors text-sm font-semibold">
+            Save Changes
+        </button> -->
+    </ng-template>
+</p-dialog>

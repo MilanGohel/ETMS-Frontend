@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, map, Observable, of, retry, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { jwtDecode } from "jwt-decode";
-import { setCurrentUser } from '../../stores/current-user.actions';
+import { setCurrentUser } from '../../stores/user-store/current-user.actions';
 import { Store } from '@ngrx/store';
-import { selectCurrentUser } from '../../stores/current-user.selectors';
+import { selectCurrentUser } from '../../stores/user-store/current-user.selectors';
 import { ApiResponse, CurrentUserDto, ErrorResponse, GoogleLoginDto, LoginRequestDto, LoginResponseDto, SignUpRequestDto, UserNameExistsDto } from '../../core/models';
 import { response } from 'express';
 
@@ -50,7 +50,6 @@ export class AuthService {
       loginRequest
     ).pipe(
       tap(response => {
-
         if (response.succeeded) {
           console.log(response)
           localStorage.setItem("AccessToken", response.data.accessToken);
@@ -129,6 +128,7 @@ export class AuthService {
     ).pipe(
       tap(
         response => {
+          console.log(JSON.stringify(response));
           if (response.succeeded) {
             localStorage.setItem("AccessToken", response.data.accessToken);
             localStorage.setItem("RefreshToken", response.data.refreshToken);

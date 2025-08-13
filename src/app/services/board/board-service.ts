@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, Observable, of } from 'rxjs';
-import { ApiResponse, BoardDto, CreateBoardDto, ErrorResponse, ProjectDto, TaskDto } from '../../core/models';
+import { catchError, Observable, of, tap } from 'rxjs';
+import { ApiResponse, BoardDto, CreateBoardDto, ErrorResponse, MoveBoardDto, ProjectDto, TaskDto } from '../../core/models';
 import { error } from 'console';
+import { response } from 'express';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,8 @@ export class BoardService {
     private http: HttpClient
   ) {
   }
+
+  isBoardDragDisabled = signal<boolean>(false);
 
   getBoardsByProjectId(projectId: number): Observable<ApiResponse<BoardDto[]> | ErrorResponse> {
 
@@ -53,8 +56,36 @@ export class BoardService {
       )
   }
 
+  moveBoard(boardId: number, moveBoardDto: MoveBoardDto) {
+    const url = `${this.apiUrl}/api/Board/move/${boardId}`;
+
+    return this.http.patch<ApiResponse<object>>(url, { ...moveBoardDto }, { withCredentials: true })
+      .pipe(
+        tap((response: ApiResponse<object>) => {
+          if (!response.succeeded) {
+            const failedResponse: ErrorResponse = {
+              succeeded: false,
+              message: 'Could not move board. Please try again later.',
+              errors: response.errors,
+              statusCode: response.statusCode
+            };
+            return of(failedResponse);
+          }
+          return of(response);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: error.error?.message,
+            errors: [error.message],
+            statusCode: error.status
+          };
+          return of(failedResponse);
+        })
+      )
+  }
+
   updateBoard(board: BoardDto) {
-    ;
     const url = `${this.apiUrl}/api/Board/${board.id}`;
 
     return this.http.put<ApiResponse<object>>(url, { ...board }, { withCredentials: true })

@@ -6,11 +6,10 @@ import { PLATFORM_ID } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { customEmailValidator } from '../../shared/validators/email.validtor';
-import { isAuthenticated } from '../../stores/current-user.selectors';
+import { isAuthenticated } from '../../stores/user-store/current-user.selectors';
 import { AuthService } from '../../services/auth/auth-service';
 import { ApiResponse, LoginResponseDto } from '../../core/models';
 import { LoadingComponent } from '../common/loading-component/loading-component';
-import { SocialAuthService } from '@abacritt/angularx-social-login';
 @Component({
   selector: 'app-login',
   standalone: true,

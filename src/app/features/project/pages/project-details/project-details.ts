@@ -9,7 +9,9 @@ import {
   lucideBell,
   lucideListFilter,
   lucideArrowUpDown,
-  lucideEllipsisVertical
+  lucideEllipsisVertical,
+  lucideFileCheck,
+  lucideFileText
 } from '@ng-icons/lucide';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
@@ -21,6 +23,7 @@ import { BoardComponent } from '../../../board/components/board/board.component'
 import { BoardService } from '../../../../services/board/board-service';
 import { ToastService } from '../../../../services/toast/toast.service';
 import { BoardFormModalComponent } from "../../../board/components/board-form-modal/board-form-modal.component";
+import { BoardStateService } from '../../../../services/board/board-state-service';
 @Component({
   selector: 'app-project-details',
   standalone: true,
@@ -41,13 +44,14 @@ import { BoardFormModalComponent } from "../../../board/components/board-form-mo
     lucideBell,
     lucideListFilter,
     lucideArrowUpDown,
-    lucideEllipsisVertical
+    lucideEllipsisVertical,
+    lucideFileText
   })],
   templateUrl: './project-details.html',
   styleUrl: './project-details.css'
 })
 export class ProjectDetails implements OnInit {
-  @ViewChild('boardComp') boardComponent!: BoardComponent;
+  boardState = inject(BoardStateService);
 
   projectId: number = 0;
   currentProject: WritableSignal<ProjectDto | null> = signal(null);
@@ -78,12 +82,12 @@ export class ProjectDetails implements OnInit {
 
   items: MenuItem[] = [
     {
-      icon: 'lucideLayoutDashboard',
+      icon: 'lucideFileText',
       routerLink: ['/tasks'], // Example link,
     },
     {
-      label: 'Board',
-      routerLink: ['/tasks/board'], // Example link,
+      label: 'Project',
+      routerLink: ['/projects'], // Example link,
     },
     {
       label: 'Overview'
@@ -117,7 +121,7 @@ export class ProjectDetails implements OnInit {
   }
 
   onBoardSubmit(boardDto: BoardDto) {
-    ;
+    
     const request = !boardDto.id
       ? this.boardService.createNewBoard(boardDto)
       : this.boardService.updateBoard(boardDto);
@@ -127,7 +131,7 @@ export class ProjectDetails implements OnInit {
         if (res.succeeded) {
           this.toast.success("Success", res.message);
           this.showBoardModal.set(false);
-          this.boardComponent.loadBoards();
+          this.boardState.loadBoards(this.projectId);
         }
       },
       error: (err) => {
