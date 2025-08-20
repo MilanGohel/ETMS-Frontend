@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { ApiResponse, ErrorResponse, UserNameExistsDto } from '../../core/models';
+import { ApiResponse, ErrorResponse, PaginatedList, UserDto, UserNameExistsDto } from '../../core/models';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
-import { response } from 'express';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +13,32 @@ export class UserService {
 
   checkUserNameExists(userName: string): Observable<boolean> {
     const url = `${this.apiUrl}/api/User/exists?userName=${userName}`;
-    const response =  this.http.get<ApiResponse<UserNameExistsDto>>(url).pipe(
-      map(response => response.data.isUserNameExists), 
+    const response = this.http.get<ApiResponse<UserNameExistsDto>>(url).pipe(
+      map(response => response.data.isUserNameExists),
       catchError(() => of(false))
     );
     console.log(response);
     return response;
   }
+
+  searchMembers(searchString: string): Observable<ApiResponse<PaginatedList<UserDto>> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/User/search/members?searchString=${searchString}`;
+
+    return this.http
+      .get<ApiResponse<PaginatedList<UserDto>> | ErrorResponse>(url)   
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: error.message,
+            errors: error.error,
+            statusCode: error.status
+          };
+          return of(failedResponse);
+        })
+      );
+  }
+
+
 
 }

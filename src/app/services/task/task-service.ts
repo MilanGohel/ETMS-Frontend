@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { ApiResponse, ErrorResponse, MoveTaskDto, ShiftTaskOrderRangeDto, TaskDto, UpdateTaskPositionDto } from '../../core/models';
+import { ApiResponse, ErrorResponse, UserDto, ShiftTaskOrderRangeDto, TaskDto, UpdateTaskPositionDto, MoveTaskDto } from '../../core/models';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { response } from 'express';
@@ -30,14 +30,31 @@ export class TaskService {
       )
   }
 
+  getTaskMembers(taskId: number): Observable<ApiResponse<UserDto[]> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/task/${taskId}/members`;
+
+    return this.http.get<ApiResponse<UserDto[]> | ErrorResponse>(url, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error("API Call failed for shifting task order.");
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            errors: error.error,
+            message: error.error.message,
+            statusCode: error.status
+          }
+          return of(failedResponse);
+        })
+      )
+  }
+
   updateTask(taskDto: TaskDto): Observable<ApiResponse<object> | ErrorResponse> {
-    debugger;
+
     const url = `${this.apiUrl}/api/Task/${taskDto.id}`
 
     return this.http.put<ApiResponse<object> | ErrorResponse>(url, { ...taskDto }, { withCredentials: true })
       .pipe(
         catchError((error: HttpErrorResponse) => {
-          
           console.error("API Call failed for shifting task order.");
           const failedResponse: ErrorResponse = {
             succeeded: false,

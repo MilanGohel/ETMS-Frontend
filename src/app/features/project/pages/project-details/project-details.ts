@@ -24,6 +24,8 @@ import { BoardService } from '../../../../services/board/board-service';
 import { ToastService } from '../../../../services/toast/toast.service';
 import { BoardFormModalComponent } from "../../../board/components/board-form-modal/board-form-modal.component";
 import { BoardStateService } from '../../../../services/board/board-state-service';
+import { BoardStateStore } from '../../../../stores/board-state-store/board-state.store';
+import { FindMembersDialogComponent } from "../../../members/components/find-members-dialog/find-members-dialog.component";
 @Component({
   selector: 'app-project-details',
   standalone: true,
@@ -34,7 +36,8 @@ import { BoardStateService } from '../../../../services/board/board-state-servic
     NgIcon,
     RouterLink,
     BoardComponent,
-    BoardFormModalComponent
+    BoardFormModalComponent,
+    FindMembersDialogComponent
   ],
   viewProviders: [provideIcons({
     lucideLayoutDashboard,
@@ -51,7 +54,7 @@ import { BoardStateService } from '../../../../services/board/board-state-servic
   styleUrl: './project-details.css'
 })
 export class ProjectDetails implements OnInit {
-  boardState = inject(BoardStateService);
+  boardState = inject(BoardStateStore);
 
   projectId: number = 0;
   currentProject: WritableSignal<ProjectDto | null> = signal(null);
@@ -109,7 +112,7 @@ export class ProjectDetails implements OnInit {
   toast = inject(ToastService);
   selectedBoard = signal<BoardDto | null>(null);
   showBoardModal = signal(false);
-
+  boardStateService = inject(BoardStateStore);
   openCreateBoardModal() {
     this.selectedBoard.set(null);
     this.showBoardModal.set(true);
@@ -121,7 +124,6 @@ export class ProjectDetails implements OnInit {
   }
 
   onBoardSubmit(boardDto: BoardDto) {
-    
     const request = !boardDto.id
       ? this.boardService.createNewBoard(boardDto)
       : this.boardService.updateBoard(boardDto);
@@ -138,6 +140,9 @@ export class ProjectDetails implements OnInit {
         this.toast.error("Error", err.message);
       }
     });
+  }
 
+  openFindMembersModal() {
+    this.boardStateService.toggleFindMembersModal();
   }
 }

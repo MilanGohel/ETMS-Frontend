@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, Inject, Injectable, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
@@ -12,56 +12,88 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { SocialAuthServiceConfig, GoogleLoginProvider, SocialLoginModule, GoogleSigninButtonDirective, SocialAuthService } from "@abacritt/angularx-social-login";
+import { SocialAuthServiceConfig, GoogleLoginProvider, SocialLoginModule } from "@abacritt/angularx-social-login";
 import { environment } from '../environments/environment.development';
 import { NgxEditorModule } from 'ngx-editor';
 
-
-const AuraCustomDark = definePreset(Aura, {
+const Noir = definePreset(Aura, {
   semantic: {
-    // 1. Define the primary color based on your --tertiary variable
-    primary: palette('{sky}'),
+    primary: {
+      50: '{sky.50}',
+      100: '{sky.100}',
+      200: '{sky.200}',
+      300: '{sky.300}',
+      400: '{sky.400}',
+      500: '{sky.500}',
+      600: '{sky.600}',
+      700: '{sky.700}',
+      800: '{sky.800}',
+      900: '{sky.900}',
+      950: '{sky.950}'
+    },
     colorScheme: {
-
-      // We'll keep the original light theme
       light: {
-        formField: {
-          hoverBorderColor: '{primary.color}'
+        primary: {
+          color: '{sky.950}',
+          inverseColor: '#ffffff',
+          hoverColor: '{sky.900}',
+          activeColor: '{sky.800}'
         },
-        surface: {
-          0: '#ffffff',
-          50: '{zinc.50}',
-          100: '{zinc.100}',
-          200: '{zinc.200}',
-          300: '{zinc.300}',
-          400: '{zinc.400}',
-          500: '{zinc.500}',
-          600: '{zinc.600}',
-          700: '{zinc.700}',
-          800: '{zinc.800}',
-          900: '{zinc.900}',
-          950: '{zinc.950}'
+        highlight: {
+          background: '{sky.950}',
+          focusBackground: '{sky.700}',
+          color: '#ffffff',
+          focusColor: '#ffffff'
         }
       },
-      // 2. Define the dark theme based on your CSS variables
       dark: {
-        formField: {
-          hoverBorderColor: '{primary.color}'
+        primary: {
+          color: '{sky.50}',
+          inverseColor: '{sky.950}',
+          hoverColor: '{sky.100}',
+          activeColor: '{sky.200}'
         },
-        surface: {
-          0: '#ffffff',
-          50: '#f1f5f9',
-          100: '#e5e7eb',
-          200: '#c7c8c9',
-          300: '#989a9c',
-          400: '#696b6d',
-          500: '#4a4c4e',
-          600: '#3b3d3f',
-          700: '#2c2e30',
-          800: '#1d1f20',
-          900: '#1a1c1e',
-          950: '#131517'
+        highlight: {
+          background: 'rgba(250, 250, 250, .16)',
+          focusBackground: 'rgba(250, 250, 250, .24)',
+          color: 'rgba(255,255,255,.87)',
+          focusColor: 'rgba(255,255,255,.87)'
         }
+      }
+    }
+  },
+  // --- ADD THIS SECTION TO STYLE THE BUTTON ---
+  components: {
+   
+    button: {
+      colorScheme: {
+        dark: {
+          root: {
+            primary: {
+              background: '#129dfd',
+              hoverBackground: '#0a7cd1',
+              activeBackground: '#117bccff',
+              color: 'white',
+              activeColor: 'rgba(255,255,255,0.8)',
+              hoverColor: 'rgba(255,255,255,0.9)',
+              borderColor: 'transparent',
+              hoverBorderColor: 'transparent',
+              activeBorderColor: 'transparent',
+            },
+            secondary: {
+              background: 'var(--color-primary-gray)',
+              hoverBackground: 'var(--color-primary-light)',
+              activeBackground: 'var(--color-primary)',
+              color: 'white',
+              activeColor: 'rgba(255,255,255,0.8)',
+              hoverColor: 'rgba(255,255,255,0.9)',
+              borderColor: 'var(--color-primary-light)',
+              hoverBorderColor: 'var(--color-primary)',
+              activeBorderColor: 'var(--color-secondary)'
+            }
+          }
+        }
+        // Add other properties like padding, border-radius etc. if needed
       }
     }
   }
@@ -70,12 +102,8 @@ const AuraCustomDark = definePreset(Aura, {
 const googleClientId = environment.googleClientId;
 
 export const appConfig: ApplicationConfig = {
-
   providers: [
-
     importProvidersFrom(SocialLoginModule),
-    importProvidersFrom(SocialAuthService),
-    importProvidersFrom(GoogleSigninButtonDirective),
     importProvidersFrom(
       NgxEditorModule.forRoot({
         locals: {
@@ -96,7 +124,7 @@ export const appConfig: ApplicationConfig = {
         providers: [
           {
             id: GoogleLoginProvider.PROVIDER_ID,
-            provider: new GoogleLoginProvider(googleClientId)
+            provider: new GoogleLoginProvider(googleClientId, { oneTapEnabled: false })
           },
         ],
         onError: (err) => { console.error(err) }
@@ -115,7 +143,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     providePrimeNG({
       theme: {
-        preset: AuraCustomDark,
+        preset: Noir,
         options: {
           darkModeSelector: true || 'none',
           cssLayer: {

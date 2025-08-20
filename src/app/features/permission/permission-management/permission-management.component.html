@@ -1,0 +1,37 @@
+<!-- src/app/features/permissions/components/permission-management/permission-management.component.html -->
+
+<p-panel header="Role and Permission Management">
+    <div class="grid">
+        <!-- Roles Column -->
+        <div class="col-12 md:col-3">
+            <h3>Roles</h3>
+            <p-listbox [options]="state.roles()" [(ngModel)]="state.selectedRoleId" (onChange)="onRoleChange($event)"
+                optionLabel="name" optionValue="id" styleClass="w-full" />
+        </div>
+
+        <!-- Permissions Column -->
+        <div class="col-12 md:col-9">
+            <h3>Permissions for selected role</h3>
+
+            <!-- Loading Spinner -->
+            <div *ngIf="state.isLoading()" class="flex justify-content-center align-items-center h-full">
+                <p-progressSpinner />
+            </div>
+
+            <!-- Permission Tree -->
+            <div *ngIf="!state.isLoading() && state.selectedRoleId()">
+                <p-tree [value]="state.permissionTree()" selectionMode="checkbox" [(selection)]="selectedPermissions"
+                    (onNodeSelect)="onPermissionSelect($event)" (onNodeUnselect)="onPermissionUnselect($event)"
+                    (onNodeExpand)="onNodeExpand($event)" (onNodeCollapse)="onNodeCollapse($event)"
+                    
+                    styleClass="w-full" />
+            </div>
+
+            <!-- Placeholder -->
+            <div *ngIf="!state.isLoading() && !state.selectedRoleId()"
+                class="text-center p-4 border-1 border-dashed border-round">
+                <p>Please select a role to manage its permissions.</p>
+            </div>
+        </div>
+    </div>
+</p-panel>

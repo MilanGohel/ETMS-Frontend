@@ -7,7 +7,8 @@
     --background: #131517;
     --secondary: rgba(29, 31, 32, 0.356);
     --tertiary: #129dfd;
-    --p-button-primary-background: #129dfd;
+    --p-inputtext-focus-border-color: #129dfd;
+    --p-select-focus-border-color: var(--tertiary);
 }
 
 @theme {
@@ -19,20 +20,10 @@
 }
 
 ::ng-deep {
-    .p-button .p-button.p-highlight {
-        background: red;
-        background-color: red;
-    }
-
-    .p-button .p-button.p-highlight:hover {
-        background: green;
-    }
-
-    .custom-button {
-        background-color: red !important;
-        background: red !important;
-    }
+   
 }
+
+
 
 :root {
     /* NgxEditor Dark Theme Variables */
@@ -52,4 +43,9 @@
     --ngx-editor-bubble-text-color: var(--p-surface-950) !important;
     --ngx-editor-bubble-item-hover-color: var(--p-surface-700) !important;
     --ngx-editor-bubble-seperator-color: var(--p-surface-950) !important;
+    --p-button-label-font-weight: 450;
+}
+
+.p-button-label {
+    font-weight: var(--p-button-label-font-weight);
 }

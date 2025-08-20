@@ -20,6 +20,7 @@ import { LoadingComponent } from '../common/loading-component/loading-component'
     ReactiveFormsModule,
     RouterOutlet,
     LoadingComponent,
+    
   ],
   templateUrl: './login.html',
   styleUrl: './login.css'
@@ -56,6 +57,7 @@ export class Login implements OnInit {
     //     this.authService.sendTokenToBackend(user.idToken, user.authToken)
     //   } 
     // })
+    
   }
 
   get email() {

@@ -1,3 +1,4 @@
+
 @if(isServer)
 {
 <app-loading-component />
@@ -71,21 +72,16 @@
         </div>
 
         <div class="flex gap-4">
-            <!-- <button (click)="onGoogleLogin()"
-                class="flex items-center justify-center gap-2 w-1/2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 hover:dark:bg-gray-700 transition"
-                type="button">
-                <img ngSrc="google-logo.webp" alt="Google" class="h-5 w-5" width="100" height="100" />
-                Google
-            </button> -->
-            <!-- <div id="g_id_onload"
-                data-client_id="263994102543-6tgsab2g1tpa322ummri3u7lugkek9f4.apps.googleusercontent.com"
-                data-context="signin" data-ux_mode="popup" data-login_uri="http://locahost:4200/login"
-                data-auto_prompt="false">
+            <div id="g_id_onload"
+                data-client_id="758622802828-n59grtq217pdomark28u1lj6t66efd1d.apps.googleusercontent.com"
+                data-context="signin" data-ux_mode="popup" data-login_uri="http://localhost:4200/login"
+                data-auto_prompt="false" #googleBtn>
             </div>
 
-            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
-                data-text="signin" data-size="large" data-logo_alignment="left" data-width="150">
-            </div> -->
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                data-text="signin_with" data-size="large" data-logo_alignment="left" #googleBtn>
+            </div>
+            <div class="" id="google-button"></div>.
 
             <!-- <asl-google-signin-button type='icon' size='medium'></asl-google-signin-button> -->
             <button (click)="onGithubLogin()"
@@ -103,8 +99,8 @@
     </div>
 </div>
 }
-}
+} 
 
 
 
-<router-outlet />
+<router-outlet></router-outlet>

@@ -19,7 +19,6 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [
     RouterLink,
-    NgIcon,
     ProjectFormModal,
     ButtonModule,
     ConfirmPopupModule

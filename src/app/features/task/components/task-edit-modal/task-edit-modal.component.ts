@@ -1,6 +1,6 @@
 // src/app/components/task/project-task-edit-modal/project-task-edit-modal.ts
-import { Component, inject, input, OnDestroy, OnInit, output, OnChanges, SimpleChanges } from '@angular/core';
-import { TaskDto } from '../../../../core/models';
+import { Component, inject, input, OnDestroy, OnInit, output, OnChanges, SimpleChanges, Input, viewChild, ViewChild, ElementRef } from '@angular/core';
+import { TaskDto, UserDto } from '../../../../core/models';
 import { DialogModule } from 'primeng/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -9,23 +9,33 @@ import { BoardStateService } from '../../../../services/board/board-state-servic
 import { TaskService } from '../../../../services/task/task-service';
 import { response } from 'express';
 import { ToastService } from '../../../../services/toast/toast.service';
+import { BoardStateStore } from '../../../../stores/board-state-store/board-state.store';
+import { Popover, PopoverModule } from 'primeng/popover';
 
 @Component({
-  selector: 'app-project-task-edit-modal',
+  selector: 'app-task-edit-modal',
   standalone: true,
-  imports: [DialogModule, ReactiveFormsModule, ButtonModule, NgxEditorModule],
-  templateUrl: './project-task-edit-modal.html',
+  imports: [DialogModule, ReactiveFormsModule, ButtonModule, NgxEditorModule, PopoverModule],
+  templateUrl: './task-edit-modal.component.html',
 })
-export class ProjectTaskEditModal implements OnChanges, OnDestroy {
+export class TaskEditModalComponent implements OnChanges, OnDestroy {
+  @ViewChild("taskMemberOp") taskMemberOp!: Popover;
   editingTask = input<TaskDto | null>(null);
-  visible = input<boolean>(false);
+
+  // visible = input<boolean>(false);
+  @Input() visible: boolean = false;
   close = output<void>();
 
   private fb = inject(FormBuilder);
-  boardStateService = inject(BoardStateService);
+  
+  boardStateService = inject(BoardStateStore);
+
   taskService = inject(TaskService);
+
   taskForm!: FormGroup;
+
   editor!: Editor;
+
   toolbar: Toolbar = [
     ['bold', 'italic'],
     ['underline', 'strike'],
@@ -37,6 +47,8 @@ export class ProjectTaskEditModal implements OnChanges, OnDestroy {
     ['align_left', 'align_center', 'align_right', 'align_justify'],
   ];
 
+  taskMembers:UserDto[] = this.boardStateService.editingTask()?.taskMembers ?? [];
+
   constructor() {
     this.editor = new Editor();
     this.taskForm = this.fb.group({
@@ -44,6 +56,15 @@ export class ProjectTaskEditModal implements OnChanges, OnDestroy {
       description: [''],
       statusId: [1, Validators.required]
     });
+  }
+
+  openTaskMembersPopOver(event: any) {
+    if (!this.editingTask() || !this.editingTask()?.id) {
+      console.error("Editing task id not found");
+      return;
+    }
+    this.boardStateService.getEditingTaskMembers({taskId: this.editingTask()?.id ?? 0})
+    this.taskMemberOp.toggle(event)
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -56,16 +77,18 @@ export class ProjectTaskEditModal implements OnChanges, OnDestroy {
       });
     }
   }
+
   toastService = inject(ToastService);
+
   onSubmitForm(): void {
     if (this.taskForm.invalid) return;
 
     // Delegate the update logic to the state service
-    const task = {...this.boardStateService.editingTask(), ...this.taskForm.value}
+    const task = { ...this.boardStateService.editingTask(), ...this.taskForm.value }
     this.taskService.updateTask(task).subscribe({
       next: (response) => {
         console.log(JSON.stringify(response) + "response")
-        if(!response.succeeded){
+        if (!response.succeeded) {
           this.toastService.error("Error Updating the task", response.message);
         }
       },
@@ -77,7 +100,7 @@ export class ProjectTaskEditModal implements OnChanges, OnDestroy {
   }
 
   onCloseDialog(): void {
-    debugger;
+
     this.close.emit();
   }
 

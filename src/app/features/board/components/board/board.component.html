@@ -4,7 +4,7 @@
     <div cdkDrag class="h-fit bg-transparent" [cdkDragData]="board"
         [cdkDragDisabled]="editingBoard() !== null || showAddTaskInputForBoard().id !== null">
         <div
-            class="flex min-w-[23em] flex-col items-center gap-1 space-x-2 rounded-lg bg-black p-3 text-sm text-gray-700 shadow-lg dark:text-gray-100">
+            class="flex min-w-[23em] flex-col items-center gap-1 space-x-2 rounded-lg bg-black p-3 text-sm text-gray-700 shadow-lg dark:text-gray-100 max-h-[65vh]">
             <div class="flex w-full flex-row justify-between px-1 py-2">
                 <div class="flex flex-row items-center gap-2">
                     <div class="h-5 w-2 rounded-md" [ngStyle]="{ 'background-color': board.colorCode }"></div>
@@ -58,8 +58,8 @@
                     (keydown.enter)="onBlurNewTask(board.id)" />
                 }
 
-                <app-project-task [tasks]="board.tasks" [taskListId]="'board-' + board.id"
-                    [connectedBoards]="connectedBoards()"></app-project-task>
+                <app-task-list [tasks]="board.tasks" [taskListId]="'board-' + board.id"
+                    [connectedBoards]="connectedBoards()"></app-task-list>
 
                 @if(showAddTaskInputForBoard().id === board.id && showAddTaskInputForBoard().position === 'end') {
                 <input #newTaskInput pInputText placeholder="Task Name" class="my-2 w-full"
@@ -81,6 +81,6 @@
     }
 </div>
 
-<app-project-task-edit-modal [visible]="boardStateService.isTaskEditModalVisible()"
+<app-task-edit-modal [visible]="boardStateService.isTaskEditModalVisible()" 
     [editingTask]="boardStateService.editingTask()" (close)="boardStateService.selectTaskForEditing(null);">
-</app-project-task-edit-modal>
+</app-task-edit-modal>

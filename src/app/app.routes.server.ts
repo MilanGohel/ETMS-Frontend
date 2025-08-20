@@ -6,4 +6,8 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   { path: 'project/:id', renderMode: RenderMode.Server },
+  {
+    path: "admin/manage-permissions",
+    renderMode: RenderMode.Client
+  }
 ];

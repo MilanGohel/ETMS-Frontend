@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment.development';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { error } from 'console';
-import { ApiResponse, CreateProjectDto, ErrorResponse, ProjectDto } from '../../core/models';
+import { AddUsersToProjectDto, ApiResponse, CreateProjectDto, ErrorResponse, ProjectDto } from '../../core/models';
 import { debugPort } from 'process';
 import { response } from 'express';
 
@@ -88,7 +88,7 @@ export class ProjectService {
   }
 
   createProject(project: ProjectDto): Observable<ProjectApiResult> {
-    
+
     const dates = {
       startDate: this.formatDateToDateOnlyString(project.startDate.toString()),
       endDate: this.formatDateToDateOnlyString(project.endDate.toString())
@@ -142,6 +142,24 @@ export class ProjectService {
     const url = `${this.apiUrl}/api/Project/${projectId}`;
 
     return this.http.delete<ApiResponse<object> | ErrorResponse>(url, { withCredentials: true })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error("Api call failed to Create Project", error);
+          const failedResponse: ErrorResponse = {
+            succeeded: false,
+            message: error.error.message,
+            errors: [error.error],
+            statusCode: error.status
+          }
+          return of(failedResponse);
+        })
+      )
+  }
+
+  addUserToProject(projectId: number, addUserToProject: AddUsersToProjectDto): Observable<ApiResponse<object> | ErrorResponse> {
+    const url = `${this.apiUrl}/api/Project/${projectId}/users`;
+
+    return this.http.post<ApiResponse<object> | ErrorResponse>(url, { ...addUserToProject }, { withCredentials: true })
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error("Api call failed to Create Project", error);

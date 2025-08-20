@@ -5,7 +5,7 @@ export interface ApiResponse<T> {
   message: string;
   errors: string[];
   succeeded: boolean;
-  statusCode: number ;
+  statusCode: number;
 }
 
 export interface ErrorResponse {
@@ -88,7 +88,6 @@ export interface BoardDto extends BaseEntityDto {
   description?: string;
   projectId: number;
   tasks: TaskDto[];
-  
 }
 
 export interface BaseEntityDto {
@@ -102,13 +101,15 @@ export interface TaskDto extends BaseEntityDto {
   name: string;
   description?: string;
   boardId: number;
+  projectId?: number;
   statusId: StatusEnum;
   isAddedAtEndOfBoard: boolean;
   previousTaskId?: number;
   nextTaskId?: number;
+  taskMembers?: UserDto[];
 }
 
-export interface MoveBoardDto{
+export interface MoveBoardDto {
   previousBoardId?: number;
   nextBoardId?: number;
 
@@ -146,4 +147,71 @@ export interface MoveTaskDto {
   newBoardId: number;
   previousTaskId?: number | null;
   nextTaskId?: number | null;
+}
+
+export interface UserDto extends BaseEntityDto {
+  firstName: string;       // required, maxLength 50
+  lastName: string;        // required, maxLength 50
+  userName: string;        // regex: ^[a-zA-Z0-9._-]{3,15}$
+  email: string;           // required, email, maxLength 100
+  avatarUrl?: string | null; // optional, maxLength 200
+}
+
+
+export enum RoleEnum {
+  ProgramManager = 2,
+  ProjectManager = 3,
+  TeamLead = 4,
+  SeniorDeveloper = 5,
+  JuniorDeveloper = 6,
+  User = 7
+}
+
+export const RoleDescriptions: Record<RoleEnum, string> = {
+  [RoleEnum.ProgramManager]: 'Program Manager',
+  [RoleEnum.ProjectManager]: 'Project Manager',
+  [RoleEnum.TeamLead]: 'Team Lead',
+  [RoleEnum.SeniorDeveloper]: 'Senior Developer',
+  [RoleEnum.JuniorDeveloper]: 'Junior Developer',
+  [RoleEnum.User]: 'User'
+};
+
+export interface PaginatedList<T> {
+  /** The items for the current page. */
+  items: T[];
+
+  /** The current page index (1-based). */
+  pageIndex: number;
+
+  /** The total number of pages. */
+  totalPages: number;
+
+  /** The total count of items across all pages. */
+  totalCount: number;
+
+  /** Indicates whether there is a previous page. */
+  hasPreviousPage: boolean;
+
+  /** Indicates whether there is a next page. */
+  hasNextPage: boolean;
+}
+
+
+export interface AddUsersToProjectDto {
+  userRoles: UserRoleDto[];
+}
+
+export interface UserRoleDto {
+  userId: number;
+  roleId: number;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+}
+
+export interface Permission {
+  id: number;
+  name: string;
 }

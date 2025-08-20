@@ -1,0 +1,97 @@
+<!-- 
+  This dialog is built entirely with PrimeNG components.
+  - p-dialog: The main container for the modal.
+  - p-inputtext: For the email/name input field.
+  - p-autoComplete: For selecting roles and permissions with dropdown functionality.
+  - p-button: For all clickable actions.
+  - p-avatar: To display user initials.
+  - p-divider: To separate items in the members list.
+-->
+<p-dialog header="Share board" [(visible)]="visible" (visibleChange)="closeDialog()" [modal]="true"
+  [style]="{width: '60rem'}" [draggable]="false" [resizable]="false">
+
+  <!-- Email Input and Share Section -->
+  <div class="grid grid-cols-6 gap-4 mb-4 items-center">
+    <!-- Input -->
+    <div class="col-span-3">
+      <p-autoComplete class="w-full" [(ngModel)]="selectedMember" [suggestions]="filteredMembers()"
+        (completeMethod)="filterMembers($event)" field="userName" [forceSelection]="true" [dropdown]="true">
+        <!-- Item template for dropdown results -->
+        <ng-template let-user pTemplate="item">
+          <div class="flex items-center gap-2">
+            <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="w-8 h-8 rounded-full border"
+              alt="{{ user.userName }}" />
+            <div class="flex flex-col">
+              <span class="font-medium">{{ user.userName }}</span>
+              <span class="text-sm text-gray-500">{{ user.email }}</span>
+            </div>
+          </div>
+        </ng-template>
+
+        <!-- Selected value shown in input box -->
+        <ng-template let-user pTemplate="selectedItem">
+          <div class="flex items-center gap-2">
+            <img *ngIf="user?.avatarUrl" [src]="user.avatarUrl" class="w-6 h-6 rounded-full border"
+              alt="{{ user?.userName }}" />
+            <span>{{ user?.userName }}</span>
+          </div>
+        </ng-template>
+      </p-autoComplete>
+    </div>
+
+
+    <!-- Role dropdown -->
+    <div class="col-span-2">
+      <p-autoComplete [(ngModel)]="selectedRole" [suggestions]="filteredRoles" (completeMethod)="filterRoles($event)"
+        optionLabel="label" [dropdown]="true" placeholder="Select Role">
+      </p-autoComplete>
+    </div>
+
+    <!-- Share button -->
+    <div>
+      <p-button label="Share" (click)="share()" styleClass="w-full">
+      </p-button>
+    </div>
+  </div>
+
+
+  <!-- Link Sharing Section -->
+  <div class="flex items-center gap-5 surface-ground p-3 border-round mb-5 ">
+    <div class="flex items-center">
+      <i class="pi pi-link text-xl mr-3"></i>
+      <div>
+        <p class="m-0 text-sm">Anyone with the link can join as a member</p>
+        <div class="flex">
+          <p-button label="Copy link" (click)="copyLink()" styleClass="p-button-link text-sm p-0 mr-3"></p-button>
+          <p-button label="Delete link" (click)="deleteLink()" styleClass="p-button-link text-sm p-0"></p-button>
+        </div>
+      </div>
+    </div>
+    <p-select [(ngModel)]="selectedPermission" [options]="permissions" optionLabel="label" style="width: 150px;"
+      placeholder="Change permissions"></p-select>
+  </div>
+
+  <!-- Board Members List -->
+  <div>
+    <h3 class="mt-0 mb-3">Board members <span
+        class="text-color-secondary font-normal text-base">{{members.length}}</span></h3>
+    <div *ngFor="let member of members; let last = last">
+      <div class="flex items-center justify-between w-full py-2">
+        <div class="flex items-center">
+          <p-avatar [label]="member.avatar" size="large" shape="circle"
+            [style]="{'background-color': member.avatarColor, 'color': '#ffffff'}" class="mr-3">
+          </p-avatar>
+          <div>
+            <p class="font-semibold m-0">{{member.name}}</p>
+            <p class="text-sm text-color-secondary m-0">{{member.email}} &bull; {{member.role}}</p>
+          </div>
+        </div>
+        <div>
+          <p-autoComplete [(ngModel)]="member.permission" optionLabel="label" [dropdown]="true">
+          </p-autoComplete>
+        </div>
+      </div>
+      <p-divider *ngIf="!last"></p-divider>
+    </div>
+  </div>
+</p-dialog>

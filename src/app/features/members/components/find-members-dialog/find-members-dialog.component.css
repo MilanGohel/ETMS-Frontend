@@ -1,0 +1,22 @@
+/* PrimeNG components come with their own styling through themes.
+  You would typically import a theme in your main styles.css or angular.json file.
+  For example: "node_modules/primeng/resources/themes/lara-dark-blue/theme.css"
+
+  This CSS file can be used for minor adjustments or overrides if needed.
+  The p-button-link class is used to make buttons look like text links.
+*/
+
+:host ::ng-deep .p-button-link {
+    text-decoration: underline;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+    border-bottom: 0 none;
+}
+:host ::ng-deep .p-autocomplete {
+  width: 100% !important;
+}
+
+:host ::ng-deep .p-autocomplete-input {
+  width: 100% !important;
+}

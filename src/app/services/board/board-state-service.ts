@@ -1,5 +1,5 @@
 // src/app/services/board/board-state.service.ts
-import { computed, inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { BoardDto, MoveBoardDto, MoveTaskDto, StatusEnum, TaskDto } from '../../core/models';
 import { BoardService } from './board-service';
 import { TaskService } from '../task/task-service';
@@ -95,7 +95,7 @@ export class BoardStateService {
     });
   }
   moveTask(event: CdkDragDrop<TaskDto[]>) {
-    debugger;
+    
     // Get the moved task data reliably from its original container and index
     const movedTask = event.previousContainer.data[event.previousIndex];
 
@@ -124,7 +124,7 @@ export class BoardStateService {
     });
   }
   moveBoard(previousIndex: number, currentIndex: number): void {
-    debugger;
+    
     const boardsArray = [...this.boards()];
     const movedBoard = boardsArray[previousIndex];
     if (!movedBoard?.id) return;

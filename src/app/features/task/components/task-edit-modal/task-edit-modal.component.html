@@ -1,0 +1,55 @@
+<p-dialog [(visible)]="visible" [modal]="true" [draggable]="false" [position]="'top'"
+    [style]="{ width: '65rem', marginTop:'40px' }" [contentStyle]="{'overflow': 'visible'}" (onHide)="onCloseDialog()">
+    <ng-template #header>
+        <div class="text-xl font-bold text-gray-900 dark:text-white">Todo Details</div>
+    </ng-template>
+
+    <!-- The form now contains the markdown editor -->
+    <form class="space-y-5" draggable="false" [formGroup]="taskForm">
+        <!-- Task Name -->
+        <div class="text-lg font-bold text-gray-900 dark:text-white">
+            {{ editingTask()?.name }}
+        </div>
+
+        <!-- Markdown Editor for Description -->
+        <!-- Replace the textarea with this component -->
+        <label for="description"> Description</label>
+        <div class="NgxEditor__Wrapper" style="height: 200px; ">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar" class="bg-black"> </ngx-editor-menu>
+            <div class="overflow-y-auto max-h-[150px]">
+                <ngx-editor [editor]="editor" formControlName="description"> </ngx-editor>
+            </div>
+        </div>
+
+        <p-button label="Assign" severity="secondary" [outlined]="true" icon="pi pi-user"
+            [style]="{color: 'white', borderColor: 'Grey'}" (onClick)="openTaskMembersPopOver($event)"></p-button>
+
+        <p-popover #taskMemberOp>
+            <div class="flex flex-col gap-4">
+                <div>
+                    <span class="font-medium block mb-2">Team Members</span>
+                    <ul class="list-none p-0 m-0 flex flex-col">
+                        @for (member of taskMembers; track member.id) {
+                            <li class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border">
+                                <!-- <img [src]="'https://primefaces.org/cdn/primeng/images/demo/avatar/' + member.avatarUrl"
+                                    style="width: 32px" /> -->
+                                <div>
+                                    <span class="font-medium">{{ member.userName }}</span>
+                                    <div class="text-sm text-surface-500 dark:text-surface-400">{{ member.email }}</div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </p-popover>
+
+    </form>
+
+    <ng-template #footer>
+        <p-button label="Cancel" (onClick)="onCloseDialog()" severity="secondary" [outlined]="true"
+            [style]="{ color: 'white' }" />
+        <p-button label="Save" (onClick)="onSubmitForm()" severity="primary" [style]="{ color: 'white' }">
+        </p-button>
+    </ng-template>
+</p-dialog>

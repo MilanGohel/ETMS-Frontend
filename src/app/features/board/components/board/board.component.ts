@@ -1,5 +1,5 @@
 // src/app/components/board/board.component.ts
-import { Component, computed, ElementRef, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideEllipsisVertical, lucidePlus } from "@ng-icons/lucide";
 import { BoardDto } from '../../../../core/models';
@@ -9,10 +9,12 @@ import { presetColors } from '../../../../shared/constants/constant';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { ProjectTaskComponent } from '../../../task/components/project-task/project-task.component';
-import { CdkDrag, CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { BoardStateService } from '../../../../services/board/board-state-service';
-import { ProjectTaskEditModal } from "../../../task/components/project-task-edit-modal/project-task-edit-modal";
+import { TaskEditModalComponent } from "../../../task/components/task-edit-modal/task-edit-modal.component";
+import { TaskListComponent } from '../../../task/components/project-task/task-list.component';
+import { BoardStateStore } from '../../../../stores/board-state-store/board-state.store';
+import { FindMembersDialogComponent } from "../../../members/components/find-members-dialog/find-members-dialog.component";
 
 @Component({
   selector: 'app-board-component',
@@ -20,8 +22,8 @@ import { ProjectTaskEditModal } from "../../../task/components/project-task-edit
   imports: [
     NgIcon, NgStyle, NgClass, FormsModule,
     PopoverModule, ColorPickerModule, InputTextModule,
-    ProjectTaskComponent, DragDropModule,
-    ProjectTaskEditModal
+    TaskListComponent, DragDropModule,
+    TaskEditModalComponent,
 ],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
@@ -31,7 +33,7 @@ export class BoardComponent implements OnInit {
   projectId = input.required<number>();
 
   // Injected state service
-  boardStateService = inject(BoardStateService);
+  boardStateService = inject(BoardStateStore);
 
   // Component state now sourced from the service
   boards = this.boardStateService.boards;
@@ -88,7 +90,12 @@ export class BoardComponent implements OnInit {
       return;
     }
     const { position } = this.showAddTaskInputForBoard();
-    this.boardStateService.createTask(boardId, this.newTaskInputValue(), position === 'end');
+    this.boardStateService.createTask({
+      boardId: boardId,
+      taskName: this.newTaskInputValue(),
+      isAddedAtEnd: position === 'end',
+      projectId: this.editingBoard()?.projectId ?? 0
+    });
     this.resetNewTaskState();
   }
 
@@ -98,7 +105,6 @@ export class BoardComponent implements OnInit {
   }
 
   // --- Drag and Drop Events ---
-
   onBoardDrop(event: CdkDragDrop<BoardDto[]>): void {
     if (event.previousIndex === event.currentIndex) return;
     this.boardStateService.moveBoard(event.previousIndex, event.currentIndex);

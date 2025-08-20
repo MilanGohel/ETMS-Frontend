@@ -4,11 +4,8 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, map, Observable, of, retry, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { jwtDecode } from "jwt-decode";
-import { setCurrentUser } from '../../stores/user-store/current-user.actions';
-import { Store } from '@ngrx/store';
-import { selectCurrentUser } from '../../stores/user-store/current-user.selectors';
 import { ApiResponse, CurrentUserDto, ErrorResponse, GoogleLoginDto, LoginRequestDto, LoginResponseDto, SignUpRequestDto, UserNameExistsDto } from '../../core/models';
-import { response } from 'express';
+import { CurrentUserStateStore } from '../../stores/user-store/current-user.state';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +16,11 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   private router = inject(Router);
   private http = inject(HttpClient);
-  private store = inject(Store);
+  private store = inject(CurrentUserStateStore);
+  userStore = inject(CurrentUserStateStore);
   isAuthenticated$ = new BehaviorSubject<boolean | null>(null);
 
-  currentUserProfile$ = this.store.select(selectCurrentUser);
+  currentUserProfile = this.store.currentUser;
 
   getUser(): Observable<ApiResponse<CurrentUserDto> | null> {
     return this.http.get<ApiResponse<CurrentUserDto>>(`${this.apiUrl}/api/auth/me`, {
@@ -30,8 +28,7 @@ export class AuthService {
     }).pipe(
       tap(response => {
         this.isAuthenticated$.next(true);
-
-        setCurrentUser({ user: response.data })
+        this.store.setCurrentUser(response.data)
       }),
       catchError(error => {
         console.error('Failed to fetch user profile:', error);
@@ -204,7 +201,7 @@ export class AuthService {
             return of(false);
           }
 
-          if (this.currentUserProfile$) return of(true);
+          if (this.currentUserProfile()) return of(true);
 
           return this.getUser().pipe(
             map(user => !!user),
@@ -218,7 +215,7 @@ export class AuthService {
     // Access token was valid
     if (this.isTokenExpired(refreshToken)) return of(false);
 
-    if (this.currentUserProfile$) return of(true);
+    if (this.currentUserProfile()) return of(true);
 
     return this.getUser().pipe(
       map(user => !!user),

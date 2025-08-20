@@ -2,12 +2,9 @@
     <header class="flex flex-row justify-between items-center">
         <h1 class="text-2xl font-bold text-white">Projects</h1>
 
-        <button (click)="openCreateModal()"
-            class="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm font-semibold">
-            <ng-icon name="lucidePlus" size="16"></ng-icon>
-            <span> Add Project</span>
-        </button>
-
+        <p-button (onClick)="openCreateModal()" label="Add Project" icon="pi pi-plus"
+            styleClass="p-button-primary p-button-sm">
+        </p-button>
 
     </header>
     <div class="flex flex-col space-y-4 mt-5">
@@ -29,11 +26,11 @@
             <div class="absolute top-4 right-4 flex space-x-3">
                 <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
                     (onClick)="openEditModal(project)">
-                    
+
                 </p-button>
                 <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
                     (onClick)="onDelete($event, project)">
-                   
+
                 </p-button>
                 <p-confirmpopup key="deleteConfirm" />
 
