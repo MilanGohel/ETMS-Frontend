@@ -7,8 +7,8 @@
   - p-avatar: To display user initials.
   - p-divider: To separate items in the members list.
 -->
-<p-dialog header="Share board" [(visible)]="visible" (visibleChange)="closeDialog()" [modal]="true"
-  [style]="{width: '60rem'}" [draggable]="false" [resizable]="false">
+<p-dialog header="Share board" [(visible)]="visible" [modal]="true"
+  [style]="{width: '60rem'}" [draggable]="false" [resizable]="false" (onHide)="closeDialog()">
 
   <!-- Email Input and Share Section -->
   <div class="grid grid-cols-6 gap-4 mb-4 items-center">

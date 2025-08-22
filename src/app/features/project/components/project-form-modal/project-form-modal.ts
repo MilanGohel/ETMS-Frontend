@@ -15,10 +15,11 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { DatePicker } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { CommonModule } from '@angular/common';
-import { ProjectDto, StatusEnum } from '../../../../core/models';
+import {  StatusEnum } from '../../../../core/models';
 import { dateRangeValidator } from '../../../../shared/validators/dateRange.validator';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
+import { ProjectDto } from '../../models/project.model';
 @Component({
   selector: 'app-project-form-modal',
   templateUrl: './project-form-modal.html',

@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpEvent, HttpEventType, HttpHandlerFn, HttpRequest } from "@angular/common/http";
 import { inject } from "@angular/core";
 import { catchError, Observable, switchMap, tap, throwError } from "rxjs";
-import { AuthService } from "../../services/auth/auth-service";
+import { AuthService } from "../../features/auth/services/auth-service";
 export function authInterceptor(
     req: HttpRequest<unknown>,
     next: HttpHandlerFn

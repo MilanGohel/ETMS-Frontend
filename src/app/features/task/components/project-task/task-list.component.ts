@@ -1,9 +1,8 @@
 import { Component, inject, input, Renderer2 } from '@angular/core';
-import { TaskDto } from '../../../../core/models';
 import { CdkDrag, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { TaskItemComponent } from "../task-item/task-item.component";
-import { BoardStateService } from '../../../../services/board/board-state-service';
-import { BoardStateStore } from '../../../../stores/board-state-store/board-state.store';
+import { BoardStateStore } from '../../../board/store/board-state.store';
+import { TaskDto } from '../../models/task.model';
 
 
 @Component({

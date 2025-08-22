@@ -17,15 +17,16 @@ import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { BoardDto, ProjectDto } from '../../../../core/models';
 import { ProjectService } from '../../../../services/project/project-service';
 import { BoardComponent } from '../../../board/components/board/board.component';
-import { BoardService } from '../../../../services/board/board-service';
-import { ToastService } from '../../../../services/toast/toast.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { BoardFormModalComponent } from "../../../board/components/board-form-modal/board-form-modal.component";
-import { BoardStateService } from '../../../../services/board/board-state-service';
-import { BoardStateStore } from '../../../../stores/board-state-store/board-state.store';
+import { BoardStateStore } from '../../../board/store/board-state.store';
 import { FindMembersDialogComponent } from "../../../members/components/find-members-dialog/find-members-dialog.component";
+import { GlobalStateStore } from '../../../shared/store/global-state-store/global-state-store';
+import { BoardService } from '../../../board/services/board-service';
+import { ProjectDto } from '../../models/project.model';
+import { BoardDto } from '../../../board/models/board.model';
 @Component({
   selector: 'app-project-details',
   standalone: true,
@@ -113,6 +114,8 @@ export class ProjectDetails implements OnInit {
   selectedBoard = signal<BoardDto | null>(null);
   showBoardModal = signal(false);
   boardStateService = inject(BoardStateStore);
+  globalStateStore = inject(GlobalStateStore);
+
   openCreateBoardModal() {
     this.selectedBoard.set(null);
     this.showBoardModal.set(true);
@@ -143,6 +146,6 @@ export class ProjectDetails implements OnInit {
   }
 
   openFindMembersModal() {
-    this.boardStateService.toggleFindMembersModal();
+    this.globalStateStore.setIsFindMemberModalOpen(true);
   }
 }

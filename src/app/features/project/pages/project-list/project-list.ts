@@ -6,13 +6,13 @@ import {
   lucideTrash2
 } from "@ng-icons/lucide";
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ProjectDto } from '../../../../core/models';
 import { ProjectService } from '../../../../services/project/project-service';
-import { ToastService } from '../../../../services/toast/toast.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { ProjectFormModal } from '../../components/project-form-modal/project-form-modal';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { RouterLink } from '@angular/router';
+import { ProjectDto } from '../../models/project.model';
 
 @Component({
   selector: 'app-project-list',

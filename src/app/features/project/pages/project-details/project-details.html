@@ -83,4 +83,4 @@
             [projectId]="projectId" (onClose)="showBoardModal.set(false)"></app-board-form-modal>
     </main>
 </div>
-<app-find-members-dialog [visible]="boardStateService.isFindMemberModalOpen()"></app-find-members-dialog>
+<app-find-members-dialog [visible]="globalStateStore.isFindMemberModalOpen()"></app-find-members-dialog>

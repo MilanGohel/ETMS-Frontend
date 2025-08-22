@@ -2,7 +2,6 @@
 import { Component, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideEllipsisVertical, lucidePlus } from "@ng-icons/lucide";
-import { BoardDto } from '../../../../core/models';
 import { NgClass, NgStyle } from '@angular/common';
 import { PopoverModule } from 'primeng/popover';
 import { presetColors } from '../../../../shared/constants/constant';
@@ -10,11 +9,11 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
-import { BoardStateService } from '../../../../services/board/board-state-service';
 import { TaskEditModalComponent } from "../../../task/components/task-edit-modal/task-edit-modal.component";
 import { TaskListComponent } from '../../../task/components/project-task/task-list.component';
-import { BoardStateStore } from '../../../../stores/board-state-store/board-state.store';
+import { BoardStateStore } from '../../store/board-state.store';
 import { FindMembersDialogComponent } from "../../../members/components/find-members-dialog/find-members-dialog.component";
+import { BoardDto } from '../../models/board.model';
 
 @Component({
   selector: 'app-board-component',

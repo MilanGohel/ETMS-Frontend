@@ -8,10 +8,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { DividerModule } from 'primeng/divider';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
-import { RoleDescriptions, RoleEnum, UserDto } from '../../../../core/models';
 import { FormsModule } from '@angular/forms';
-import { GlobalStateStore } from '../../../../stores/global-state-store/global-state-store';
+import { GlobalStateStore } from '../../../shared/store/global-state-store/global-state-store';
 import { SelectModule } from 'primeng/select';
+import { UserDto } from '../../../shared/models/user.model';
+import { RoleDescriptions, RoleEnum } from '../../../../core/models';
 
 @Component({
   selector: 'app-find-members-dialog',
@@ -71,7 +72,6 @@ export class FindMembersDialogComponent {
     { label: RoleDescriptions[RoleEnum.TeamLead], value: RoleEnum.TeamLead },
     { label: RoleDescriptions[RoleEnum.SeniorDeveloper], value: RoleEnum.SeniorDeveloper },
     { label: RoleDescriptions[RoleEnum.JuniorDeveloper], value: RoleEnum.JuniorDeveloper },
-    { label: RoleDescriptions[RoleEnum.User], value: RoleEnum.User }
   ];
 
   permissions = [
@@ -80,9 +80,10 @@ export class FindMembersDialogComponent {
   ];
 
   selectedRole = null;
-  selectedPermission = null;
+  selectedPermission = this.permissions[0];
   filteredRoles: any[] = [];
   selectedMember!: UserDto;
+  globalState = inject(GlobalStateStore);
 
   globalStateStore = inject(GlobalStateStore);
   filterRoles(event: AutoCompleteCompleteEvent) {
@@ -130,6 +131,6 @@ export class FindMembersDialogComponent {
 
   closeDialog() {
     this.visible = false;
-    this.visibleChange.emit(this.visible);
+    this.globalState.setIsFindMemberModalOpen(false);
   }
 }

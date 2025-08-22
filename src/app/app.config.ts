@@ -4,7 +4,6 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
-import { currentUserReducer } from './stores/user-store/current-user.reducer';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { definePreset, palette } from '@primeuix/themes';
@@ -15,6 +14,7 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { SocialAuthServiceConfig, GoogleLoginProvider, SocialLoginModule } from "@abacritt/angularx-social-login";
 import { environment } from '../environments/environment.development';
 import { NgxEditorModule } from 'ngx-editor';
+import { currentUserReducer } from './features/shared/store/user-store/current-user.reducer';
 
 const Noir = definePreset(Aura, {
   semantic: {

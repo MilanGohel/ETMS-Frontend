@@ -1,12 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { ApiResponse, ErrorResponse, PaginatedList, UserDto, UserNameExistsDto } from '../../core/models';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { ApiResponse } from '../../features/shared/models/api-response.model';
+import { PaginatedList } from '../../features/shared/models/pagination.model';
+import { UserDto } from '../../features/shared/models/user.model';
+import { ErrorResponse } from '../../features/shared/models/error-response.model';
+import { UserNameExistsDto } from '../../core/models';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class UserService {
   private apiUrl = environment.apiUrl;
   private http = inject(HttpClient);
@@ -38,7 +43,4 @@ export class UserService {
         })
       );
   }
-
-
-
 }

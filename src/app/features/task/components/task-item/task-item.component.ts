@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, inject, input, Output, output, Renderer2, signal, ViewChild, WritableSignal } from '@angular/core';
-import { TaskDto } from '../../../../core/models';
 import { CdkDrag, CdkDragPlaceholder } from '@angular/cdk/drag-drop';
-import { BoardService } from '../../../../services/board/board-service';
+import { BoardService } from '../../../board/services/board-service';
+import { TaskDto } from '../../models/task.model';
 
 @Component({
   selector: 'app-task-item',

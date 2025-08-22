@@ -1,0 +1,66 @@
+<div class="h-full w-full flex items-center justify-center">
+  <div class="w-full max-w-sm p-8 rounded-xl bg-[var(--secondary)] shadow-lg border border-[var(--color-primary-gray)]">
+    <div class="flex flex-col items-center text-center space-y-6">
+
+      <div class="relative w-24 h-24">
+        <div
+          class="w-24 h-24 rounded-full bg-gray-600 flex items-center justify-center border-2 border-[var(--tertiary)] overflow-hidden group">
+          <img [ngSrc]="profileForm.get('profileUrl')?.value || 'default-profile.jpg'" alt="profile image" height="100"
+            width="100" class="object-cover w-full h-full" />
+
+          <div
+            class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+            <label for="profileImageInput" class="cursor-pointer p-2 bg-[var(--tertiary)] rounded-full shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 7h4l1.5-2h7L17 7h4v12H3V7zm9 3a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            </label>
+            <input id="profileImageInput" type="file" class="hidden" (change)="onProfileImageSelected($event)"
+              accept="image/*" />
+          </div>
+        </div>
+      </div>
+
+      @if (!isEditing) {
+      <div class="w-full text-white space-y-3 text-center">
+        <h2 class="text-xl font-bold">
+          {{ currentUserState.user()?.firstName }} {{ currentUserState.user()?.lastName }}
+        </h2>
+        <p class="text-sm font-semibold text-gray-400">
+          {{ currentUserState.user()?.userName }}
+        </p>
+        <div class="mt-2 text-[var(--tertiary)] font-medium">
+          {{ currentUserState.user()?.email }}
+        </div>
+        <div class="pt-4">
+          <p-button label="Edit Profile" styleClass="w-full" severity="primary"  (onClick)="enterEditMode()"/>
+        </div>
+      </div>
+      } @else {
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="w-full text-white space-y-3">
+        <input type="text" formControlName="firstName" placeholder="First name"
+          class="w-full text-center bg-transparent border-b border-gray-500 focus:outline-none focus:border-[var(--tertiary)] text-xl font-bold" />
+        <input type="text" formControlName="lastName" placeholder="Last name"
+          class="w-full text-center bg-transparent border-b border-gray-500 focus:outline-none focus:border-[var(--tertiary)] text-xl font-bold" />
+        <input type="text" formControlName="userName" placeholder="@userName"
+          class="w-full text-center bg-transparent border-b border-gray-500 focus:outline-none text-sm font-semibold text-gray-400 cursor-not-allowed" />
+        <div class="mt-2 text-[var(--tertiary)] font-medium">
+          {{ currentUserState.user()?.email }}
+        </div>
+        <div class="flex space-x-4 pt-4">
+          <button type="submit" [disabled]="profileForm.invalid || !profileForm.dirty || isSaving()"
+            class="flex-1 px-4 py-2 bg-[var(--tertiary)] text-white font-semibold rounded-xl shadow-md hover:bg-opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            {{ isSaving() ? 'Saving...' : 'Save' }}
+          </button>
+          <button type="button" (click)="cancelEdit()"
+            class="flex-1 px-4 py-2 bg-gray-700 text-gray-300 font-semibold rounded-xl shadow-md hover:bg-gray-600 transition">
+            Cancel
+          </button>
+        </div>
+      </form>
+      }
+    </div>
+  </div>
+</div>

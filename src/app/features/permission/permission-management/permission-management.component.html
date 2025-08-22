@@ -1,37 +1,61 @@
 <!-- src/app/features/permissions/components/permission-management/permission-management.component.html -->
 
-<p-panel header="Role and Permission Management">
-    <div class="grid">
+<p-panel header="Role and Permission Management"
+    styleClass="rounded-2xl shadow-lg bg-[var(--color-primary)] border border-[var(--color-primary-gray)] text-gray-100">
+    <div class="grid gap-6">
         <!-- Roles Column -->
         <div class="col-12 md:col-3">
-            <h3>Roles</h3>
+            <h3 class="text-lg font-semibold mb-3 text-gray-200">Roles</h3>
             <p-listbox [options]="state.roles()" [(ngModel)]="state.selectedRoleId" (onChange)="onRoleChange($event)"
-                optionLabel="name" optionValue="id" styleClass="w-full" />
+                optionLabel="name" optionValue="id"
+                styleClass="w-full border border-[var(--color-primary-gray)] rounded-xl bg-[var(--color-primary-light)] text-gray-100 shadow-sm hover:shadow-lg transition duration-200" />
         </div>
 
         <!-- Permissions Column -->
-        <div class="col-12 md:col-9">
-            <h3>Permissions for selected role</h3>
+        <div class="col-12 md:col-6 flex flex-col">
+            <h3 class="text-lg font-semibold mb-3 text-gray-200">Permissions for selected role</h3>
 
             <!-- Loading Spinner -->
-            <div *ngIf="state.isLoading()" class="flex justify-content-center align-items-center h-full">
+            <div *ngIf="state.isLoading()"
+                class="flex justify-center items-center h-64 bg-[var(--color-primary-light)] rounded-xl border border-[var(--color-primary-gray)]">
                 <p-progressSpinner />
             </div>
 
-            <!-- Permission Tree -->
-            <div *ngIf="!state.isLoading() && state.selectedRoleId()">
+            <!-- Permission Tree-->
+            <div *ngIf="!state.isLoading() && state.selectedRoleId()"
+                class="flex-1 p-4 border border-[var(--color-primary-gray)] rounded-xl shadow-sm bg-[var(--color-primary-light)]">
                 <p-tree [value]="state.permissionTree()" selectionMode="checkbox" [(selection)]="selectedPermissions"
-                    (onNodeSelect)="onPermissionSelect($event)" (onNodeUnselect)="onPermissionUnselect($event)"
-                    (onNodeExpand)="onNodeExpand($event)" (onNodeCollapse)="onNodeCollapse($event)"
-                    
-                    styleClass="w-full" />
+                    styleClass="w-full text-gray-100" />
             </div>
+            <!-- <div *ngIf="!state.isLoading() && state.selectedRoleId()"
+                class="flex-1 p-4 border border-[var(--color-primary-gray)] rounded-xl shadow-sm bg-[var(--color-primary-light)]">
 
+                @for (permission of state.permissions(); track permission.id) {
+                <div class="flex items-center">
+                    <p-checkbox [inputId]="'perm-' + permission.id" name="permissions" [value]="permission.id"
+                        [(ngModel)]="selectedPermissionIds" />
+                    <label [for]="'perm-' + permission.id" class="ml-2">{{ permission.name }}</label>
+                </div>
+                }
+            </div> -->
+
+            @if(!state.isLoading() && state.selectedRoleId())
+            {
+            <div class="flex justify-end gap-4 mt-6">
+                <p-button label="Cancel" (onClick)="onCancel()"
+                    styleClass="p-button-outlined border-[var(--color-primary-gray)] text-gray-200 hover:bg-[var(--color-primary-gray)]"></p-button>
+                <p-button label="Save" (onClick)="onSave()"
+                    styleClass="bg-[var(--color-secondary)] border-[var(--color-secondary)] text-white hover:opacity-90"></p-button>
+            </div>
+            }
             <!-- Placeholder -->
             <div *ngIf="!state.isLoading() && !state.selectedRoleId()"
-                class="text-center p-4 border-1 border-dashed border-round">
-                <p>Please select a role to manage its permissions.</p>
+                class="flex-1 text-center p-6 border-2 border-dashed border-[var(--color-primary-gray)] rounded-xl bg-[var(--color-primary-light)]">
+                <p class="text-gray-400">Please select a role to manage its permissions.</p>
             </div>
+
+            <!-- Action Buttons -->
+
         </div>
     </div>
 </p-panel>

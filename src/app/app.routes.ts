@@ -1,15 +1,15 @@
 import { Routes } from '@angular/router';
-import { Layout } from './core/layout/layout';
-import { Dashboard } from './features/dashboard/dashboard';
-import { Signup } from './features/signup/signup';
-import { AuthGuard } from './auth-guard';
+import { Layout } from './shared/components/layout/layout';
+import { Dashboard } from './features/dashboard/pages/dashboard';
+import { AuthGuard } from './core/guards/auth-guard';
 import { ProjectDetails } from './features/project/pages/project-details/project-details';
-import { Login } from './features/login/login';
 import { ProjectList } from './features/project/pages/project-list/project-list';
 import { VerifyUserComponent } from './features/verify-user/verify-user.component';
-import { GoogleLoginProvider, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
 import { environment } from '../environments/environment.development';
 import { PermissionManagementComponent } from './features/permission/permission-management/permission-management.component';
+import { UserProfileComponent } from './features/my-profile/pages/my-profile.component';
+import { Signup } from './features/auth/pages/signup/signup';
+import { Login } from './features/auth/pages/login/login';
 const googleClientId = environment.googleClientId;
 
 export const routes: Routes = [
@@ -25,6 +25,10 @@ export const routes: Routes = [
             {
                 path: 'project/:id',
                 component: ProjectDetails,
+            },
+            {
+                path: "my-profile",
+                component: UserProfileComponent
             }
         ],
         canActivate: [AuthGuard]
@@ -32,22 +36,6 @@ export const routes: Routes = [
     {
         path: "login",
         component: Login,
-        providers: [
-            {
-                provide: 'SocialAuthServiceConfig',
-                useValue: {
-                    autoLogin: false,
-                    providers: [
-                        {
-                            id: GoogleLoginProvider.PROVIDER_ID,
-                            provider: new GoogleLoginProvider(googleClientId)
-                        },
-                    ],
-                    onError: (err) => { console.error(err) }
-                } as SocialAuthServiceConfig
-            }
-        ]
-
     },
     {
         path: "signup",
@@ -60,5 +48,6 @@ export const routes: Routes = [
     {
         path: "admin/manage-permissions",
         component: PermissionManagementComponent
-    }
+    },
+
 ];

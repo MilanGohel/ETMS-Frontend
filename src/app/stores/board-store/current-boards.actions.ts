@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store";
-import { BoardDto, TaskDto } from "../../core/models";
+import { BoardDto } from "../../features/board/models/board.model";
+import { TaskDto } from "../../features/task/models/task.model";
 
 export const setCurrentBoards = createAction(
     '[CurrentBoards] Set',

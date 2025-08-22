@@ -1,16 +1,18 @@
 // src/app/components/task/project-task-edit-modal/project-task-edit-modal.ts
 import { Component, inject, input, OnDestroy, OnInit, output, OnChanges, SimpleChanges, Input, viewChild, ViewChild, ElementRef } from '@angular/core';
-import { TaskDto, UserDto } from '../../../../core/models';
 import { DialogModule } from 'primeng/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
-import { BoardStateService } from '../../../../services/board/board-state-service';
-import { TaskService } from '../../../../services/task/task-service';
+import { TaskService } from '../../services/task-service';
+
 import { response } from 'express';
-import { ToastService } from '../../../../services/toast/toast.service';
-import { BoardStateStore } from '../../../../stores/board-state-store/board-state.store';
+import { ToastService } from '../../../shared/services/toast/toast.service';
+import { BoardStateStore } from '../../../board/store/board-state.store';
 import { Popover, PopoverModule } from 'primeng/popover';
+import { BoardStateService } from '../../../board/services/board-state-service';
+import { TaskDto } from '../../models/task.model';
+import { UserDto } from '../../../shared/models/user.model';
 
 @Component({
   selector: 'app-task-edit-modal',

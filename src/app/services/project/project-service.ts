@@ -4,9 +4,12 @@ import { environment } from '../../../environments/environment.development';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { error } from 'console';
-import { AddUsersToProjectDto, ApiResponse, CreateProjectDto, ErrorResponse, ProjectDto } from '../../core/models';
 import { debugPort } from 'process';
 import { response } from 'express';
+import { ApiResponse } from '../../features/shared/models/api-response.model';
+import { ProjectDto } from '../../features/project/models/project.model';
+import { ErrorResponse } from '../../features/shared/models/error-response.model';
+import { AddUsersToProjectDto } from '../../features/project/models/add-users-to-project.model';
 
 
 type ProjectApiResult = ApiResponse<ProjectDto> | ErrorResponse;

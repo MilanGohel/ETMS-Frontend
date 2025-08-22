@@ -6,13 +6,13 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { AuthService } from '../../services/auth/auth-service';
+import { AuthService } from '../auth/services/auth-service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   isPlatformBrowser,
   NgOptimizedImage,
 } from '@angular/common';
-import { LoadingComponent } from '../common/loading-component/loading-component';
+import { LoadingComponent } from '../../shared/components/loading-component/loading-component';
 
 @Component({
   selector: 'app-verify-user.component',
